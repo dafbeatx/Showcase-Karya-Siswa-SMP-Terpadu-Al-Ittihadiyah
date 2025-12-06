@@ -40,13 +40,10 @@ const filterCategories = ["All", "Tech", "Art", "Science", "Lainnya"];
 // --- HELPER: CONVERT GOOGLE DRIVE LINK ---
 const getGoogleDriveImgUrl = (url) => {
   if (!url) return '';
-  // Cek apakah ini link Google Drive
   if (url.includes('drive.google.com')) {
-    // Ekstrak ID file
     const idMatch = url.match(/\/d\/(.*?)\/|\/d\/(.*)/);
     const fileId = idMatch ? (idMatch[1] || idMatch[2]) : null;
     if (fileId) {
-      // Gunakan layanan lh3.googleusercontent.com untuk thumbnail langsung
       return `https://lh3.googleusercontent.com/d/${fileId}`;
     }
   }
@@ -105,13 +102,11 @@ export default function App() {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validasi Ukuran (Max 800KB agar muat di Firestore)
     if (file.size > 800 * 1024) {
       alert("Ukuran gambar terlalu besar! Harap pilih gambar di bawah 800KB.");
       return;
     }
 
-    // Convert ke Base64
     const reader = new FileReader();
     reader.onloadend = () => {
       setFormData(prev => ({ ...prev, image: reader.result }));
@@ -129,15 +124,12 @@ export default function App() {
     }
   };
 
-  // --- HANDLE DELETE ---
+  // --- HANDLE DELETE (LANGSUNG HAPUS TANPA KONFIRMASI) ---
   const handleDelete = async (id) => {
-    // Konfirmasi sederhana (password simple)
-    const confirmDelete = window.confirm("Apakah Anda yakin ingin menghapus projek ini?");
-    if (!confirmDelete) return;
-
+    // UPDATED: Langsung hapus tanpa window.confirm
     try {
       await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'projects', id));
-      alert("Projek berhasil dihapus!");
+      // Opsional: Bisa kasih notifikasi kecil (toast) jika mau, tapi ini sudah cukup
     } catch (error) {
       console.error("Error deleting:", error);
       alert("Gagal menghapus. Cek permission.");
@@ -164,13 +156,11 @@ export default function App() {
     try {
       const formattedTags = formData.tags.split(',').map(t => t.trim()).filter(t => t);
       
-      // Proses URL Gambar (Cek apakah Drive atau Link Biasa)
       let finalImage = formData.image;
       if (imageUploadMode === 'link' && finalImage.includes('drive.google.com')) {
         finalImage = getGoogleDriveImgUrl(finalImage);
       }
       
-      // Fallback Image
       if (!finalImage.trim()) {
         finalImage = 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop';
       }
@@ -255,9 +245,20 @@ export default function App() {
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter mb-4 md:mb-6 leading-[1.15] md:leading-tight">
           Karya <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">Siswa/i</span>, <br /> Masa Depan Kalian.
         </h1>
-        <p className="text-gray-400 text-base md:text-xl max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed px-2">
+        <p className="text-gray-400 text-base md:text-xl max-w-2xl mx-auto mb-6 leading-relaxed px-2">
           Selamat datang di platform galeri digital SMP Terpadu Al-Ittihadiyah. Tempat kami merayakan kreativitas, inovasi teknologi, dan bakat seni dari seluruh siswa.
         </p>
+
+        {/* UPDATED: TOMBOL SUBMIT DI HERO (VISIBLE ON MOBILE) */}
+        <div className="flex justify-center mb-8 md:hidden">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="px-6 py-3 bg-white text-black font-bold rounded-full flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.3)] animate-pulse"
+          >
+            <Plus size={18} /> Upload Karyamu
+          </button>
+        </div>
+
         <form onSubmit={handleSearchSubmit} className="relative w-full max-w-xl mx-auto mb-6 md:mb-8 group px-2">
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-purple-400 transition-colors" size={18} />
           <input type="text" placeholder="Cari judul karya atau nama siswa..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
