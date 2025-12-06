@@ -341,7 +341,7 @@ export default function App() {
               <div className="flex flex-wrap gap-3">
                 <a href="https://github.com/dafbeatx" target="_blank" rel="noreferrer" className="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-white hover:text-black transition-all hover:-translate-y-1"><Github size={18} /></a>
                 <a href="https://youtube.com/@smpterpadualittihadiyahbogor?si=ZREUlBQW8hNF9ja1" target="_blank" rel="noreferrer" className="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-red-600 hover:text-white transition-all hover:-translate-y-1"><Youtube size={18} /></a>
-                <a href="https://www.instagram.com/smpterpadu_alittihadiyah/" target="_blank" rel="noreferrer" className="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-gradient-to-tr hover:from-yellow-500 hover:via-purple-500 hover:to-pink-500 hover:text-white transition-all hover:-translate-y-1"><Instagram size={18} /></a>
+                <a href="https://www.instagram.com/smpterpadu_alittihadiyah?igsh=MXJobTRwbHhyc2VwNA==" target="_blank" rel="noreferrer" className="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-gradient-to-tr hover:from-yellow-500 hover:via-purple-500 hover:to-pink-500 hover:text-white transition-all hover:-translate-y-1"><Instagram size={18} /></a>
               </div>
             </div>
             <div className="space-y-4">
