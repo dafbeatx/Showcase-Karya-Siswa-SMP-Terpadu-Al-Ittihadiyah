@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Warna background utama */
+body {
+  background-color: #09090b;
+  color: white;
+  font-family: 'Inter', sans-serif;
+}
