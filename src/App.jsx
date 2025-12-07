@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  FolderOpen, Search, Code, Palette, Beaker, 
+  FolderOpen, ExternalLink, Search, Code, Palette, Beaker, 
   Menu, X, Plus, Loader2, Send, Edit3, Sparkles, ArrowRight,
   Phone, MapPin, Github, Youtube, Instagram, Heart, Copyright,
   Trash2, Image as ImageIcon, Link as LinkIcon, Upload, Lock, AlertTriangle
@@ -37,6 +37,42 @@ const APP_ID = 'smp-al-ittihadiyah-showcase';
 const predefinedFormCategories = ["Tech", "Art", "Science"];
 const filterCategories = ["All", "Tech", "Art", "Science", "Lainnya"];
 
+// --- HELPER: KOMPRES GAMBAR OTOMATIS ---
+// Fungsi ini mengubah gambar besar menjadi kecil (max lebar 800px) dan kualitas sedang
+const compressImage = async (file) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        // Atur ukuran maksimal (misal lebar 800px) biar ringan
+        const MAX_WIDTH = 800;
+        const scaleSize = MAX_WIDTH / img.width;
+        
+        // Jika gambar sudah kecil, tidak perlu di-resize, tapi tetap dikompres
+        if (img.width > MAX_WIDTH) {
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
+        } else {
+            canvas.width = img.width;
+            canvas.height = img.height;
+        }
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // Ubah jadi JPEG dengan kualitas 0.7 (cukup bagus tapi size kecil)
+        // Ini kuncinya agar muat di database gratisan
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+        resolve(dataUrl);
+      };
+    };
+  });
+};
+
 // --- HELPER: CONVERT GOOGLE DRIVE LINK ---
 const getGoogleDriveImgUrl = (url) => {
   if (!url) return '';
@@ -61,6 +97,7 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageUploadMode, setImageUploadMode] = useState('file'); // Default 'file' local
+  const [isProcessingImg, setIsProcessingImg] = useState(false); // Indikator sedang kompres
   
   // State Delete
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -107,8 +144,8 @@ export default function App() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // --- HANDLE 2 FILES UPLOAD ---
-  const handleFileChange = (e) => {
+  // --- HANDLE FILE UPLOAD WITH AUTO COMPRESS ---
+  const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
     
     // Validasi Jumlah File
@@ -118,30 +155,26 @@ export default function App() {
       return;
     }
 
+    setIsProcessingImg(true); // Tampilkan loading kompres
     const processedImages = [];
-    let processedCount = 0;
 
-    files.forEach(file => {
-      // Validasi Ukuran (Max 400KB per foto agar DB aman)
-      if (file.size > 400 * 1024) {
-        alert(`File ${file.name} terlalu besar! Maksimal 400KB.`);
-        return;
+    // Loop semua file untuk dikompres satu per satu
+    for (const file of files) {
+      try {
+        // Kompres otomatis berapapun ukurannya
+        const compressedBase64 = await compressImage(file);
+        processedImages.push(compressedBase64);
+      } catch (err) {
+        console.error("Gagal kompres gambar:", err);
       }
+    }
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        processedImages.push(reader.result);
-        processedCount++;
-        
-        // Jika semua file sudah diproses
-        if (processedCount === files.length) {
-          setLocalImageFiles(processedImages); // Simpan array gambar
-          // Set preview gambar pertama dulu
-          setFormData(prev => ({ ...prev, image: processedImages[0] }));
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    setLocalImageFiles(processedImages);
+    // Tampilkan preview gambar pertama
+    if (processedImages.length > 0) {
+      setFormData(prev => ({ ...prev, image: processedImages[0] }));
+    }
+    setIsProcessingImg(false); // Selesai kompres
   };
 
   const handleCategorySelect = (cat) => {
@@ -171,12 +204,9 @@ export default function App() {
     }
 
     setIsDeleting(true);
-    
-    // PERBAIKAN: Hapus await agar UI tidak menunggu server (Optimistic UI)
     deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'projects', projectToDelete))
       .catch((err) => console.error("Gagal hapus di background:", err));
 
-    // Langsung tutup modal agar terasa cepat
     setIsDeleteModalOpen(false);
     setProjectToDelete(null);
     setDeletePassword("");
@@ -198,6 +228,7 @@ export default function App() {
     e.preventDefault();
     if (!user) return alert("Menunggu koneksi...");
     if (!formData.category.trim()) return alert("Isi kategori!");
+    if (isProcessingImg) return alert("Tunggu sebentar, sedang memproses gambar...");
 
     setIsSubmitting(true);
     try {
@@ -218,21 +249,19 @@ export default function App() {
         finalImage = 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop';
       }
 
-      // PERBAIKAN: Hapus await agar UI tidak muter terus (Optimistic UI)
       addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', 'projects'), {
         ...formData,
         tags: formattedTags,
         image: finalImage,
         gallery: imageUploadMode === 'file' ? localImageFiles : [],
         createdAt: serverTimestamp()
-      }).catch((err) => alert("Gagal upload di background (Cek koneksi/ukuran file)."));
+      }).catch((err) => alert("Gagal upload di background. Cek koneksi."));
 
-      // Langsung Reset & Tutup Modal
       setFormData({ title: '', student: '', category: 'Tech', image: '', desc: '', driveLink: '', tags: '' });
       setLocalImageFiles([]);
       setIsCustomCategory(false);
       setIsModalOpen(false);
-      setIsSubmitting(false); // Stop spinner immediately
+      setIsSubmitting(false);
 
     } catch (error) {
       console.error(error);
@@ -504,11 +533,20 @@ export default function App() {
                    {imageUploadMode === 'file' ? (
                      <div className="relative group">
                        <div className="absolute inset-0 bg-zinc-900/50 border-2 border-white/10 border-dashed rounded-xl flex flex-col items-center justify-center pointer-events-none group-hover:border-purple-500/50 transition-colors">
-                         <Upload size={24} className="text-gray-500 mb-2"/>
-                         <span className="text-gray-400 text-xs font-medium">Klik untuk pilih 1-2 Foto (Max 400KB)</span>
-                         {localImageFiles.length > 0 && <span className="text-green-400 text-[10px] mt-1 font-bold">{localImageFiles.length} foto terpilih!</span>}
+                         {isProcessingImg ? (
+                            <div className="flex flex-col items-center">
+                               <Loader2 className="animate-spin text-purple-500 mb-2" size={24}/>
+                               <span className="text-gray-400 text-xs">Sedang mengompres gambar...</span>
+                            </div>
+                         ) : (
+                            <>
+                                <Upload size={24} className="text-gray-500 mb-2"/>
+                                <span className="text-gray-400 text-xs font-medium">Klik untuk pilih 1-2 Foto (Auto Compress)</span>
+                                {localImageFiles.length > 0 && <span className="text-green-400 text-[10px] mt-1 font-bold">{localImageFiles.length} foto siap upload!</span>}
+                            </>
+                         )}
                        </div>
-                       <input type="file" accept="image/*" multiple onChange={handleFileChange} className="w-full h-24 opacity-0 cursor-pointer"/>
+                       <input type="file" accept="image/*" multiple onChange={handleFileChange} className="w-full h-24 opacity-0 cursor-pointer" disabled={isProcessingImg}/>
                      </div>
                    ) : (
                      <div className="relative">
@@ -534,7 +572,7 @@ export default function App() {
                  <input name="tags" value={formData.tags} onChange={handleInputChange} placeholder="Tags (misal: IoT, Web)" className="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 outline-none text-xs md:text-sm"/>
               </div>
               
-              <button type="submit" disabled={isSubmitting} className="w-full py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 flex justify-center gap-2 transition-transform active:scale-95 disabled:opacity-50 shadow-lg shadow-white/5 mt-4">
+              <button type="submit" disabled={isSubmitting || isProcessingImg} className="w-full py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 flex justify-center gap-2 transition-transform active:scale-95 disabled:opacity-50 shadow-lg shadow-white/5 mt-4">
                 {isSubmitting ? <Loader2 className="animate-spin"/> : <Send size={18}/>} Submit Sekarang
               </button>
             </form>
