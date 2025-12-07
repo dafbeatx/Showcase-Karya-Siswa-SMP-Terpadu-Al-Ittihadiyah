@@ -161,7 +161,7 @@ export default function App() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = async (e) => {
+  const handleConfirmDelete = (e) => {
     e.preventDefault();
     if (!projectToDelete) return;
 
@@ -171,17 +171,16 @@ export default function App() {
     }
 
     setIsDeleting(true);
-    try {
-      await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'projects', projectToDelete));
-      setIsDeleteModalOpen(false);
-      setProjectToDelete(null);
-      setDeletePassword("");
-    } catch (error) {
-      console.error("Error deleting:", error);
-      alert("Gagal menghapus.");
-    } finally {
-      setIsDeleting(false);
-    }
+    
+    // PERBAIKAN: Hapus await agar UI tidak menunggu server (Optimistic UI)
+    deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'projects', projectToDelete))
+      .catch((err) => console.error("Gagal hapus di background:", err));
+
+    // Langsung tutup modal agar terasa cepat
+    setIsDeleteModalOpen(false);
+    setProjectToDelete(null);
+    setDeletePassword("");
+    setIsDeleting(false);
   };
 
   const handleSearchSubmit = (e) => {
@@ -195,7 +194,7 @@ export default function App() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!user) return alert("Menunggu koneksi...");
     if (!formData.category.trim()) return alert("Isi kategori!");
@@ -208,39 +207,37 @@ export default function App() {
 
       // LOGIKA RANDOM THUMBNAIL (Jika Upload Lokal)
       if (imageUploadMode === 'file' && localImageFiles.length > 0) {
-        // Acak index (0 atau 1)
         const randomIndex = Math.floor(Math.random() * localImageFiles.length);
-        finalImage = localImageFiles[randomIndex]; // Ambil foto random sebagai cover
+        finalImage = localImageFiles[randomIndex]; 
       } 
-      // LOGIKA GOOGLE DRIVE
       else if (imageUploadMode === 'link' && finalImage.includes('drive.google.com')) {
         finalImage = getGoogleDriveImgUrl(finalImage);
       }
       
-      // Fallback
       if (!finalImage || !finalImage.trim()) {
         finalImage = 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop';
       }
 
-      await addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', 'projects'), {
+      // PERBAIKAN: Hapus await agar UI tidak muter terus (Optimistic UI)
+      addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', 'projects'), {
         ...formData,
         tags: formattedTags,
         image: finalImage,
-        // Kita bisa simpan array foto juga jika mau dikembangkan nanti
         gallery: imageUploadMode === 'file' ? localImageFiles : [],
         createdAt: serverTimestamp()
-      });
+      }).catch((err) => alert("Gagal upload di background (Cek koneksi/ukuran file)."));
 
-      // Reset
+      // Langsung Reset & Tutup Modal
       setFormData({ title: '', student: '', category: 'Tech', image: '', desc: '', driveLink: '', tags: '' });
       setLocalImageFiles([]);
       setIsCustomCategory(false);
       setIsModalOpen(false);
+      setIsSubmitting(false); // Stop spinner immediately
+
     } catch (error) {
       console.error(error);
-      alert("Gagal upload. Mungkin ukuran file terlalu besar (Max total 1MB).");
-    } finally {
       setIsSubmitting(false);
+      alert("Terjadi kesalahan saat memproses data.");
     }
   };
 
@@ -314,7 +311,7 @@ export default function App() {
         <div className="flex justify-center mb-8 md:hidden">
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="px-6 py-3 bg-white text-black font-bold rounded-full flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.3)] animate-pulse"
+            className="px-6 py-3 bg-white text-black font-bold rounded-full flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.3)] animate-pulse hover:scale-105 transition-transform"
           >
             <Plus size={18} /> Upload Karyamu
           </button>
