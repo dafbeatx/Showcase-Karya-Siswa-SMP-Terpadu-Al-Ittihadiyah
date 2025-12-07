@@ -10,29 +10,43 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
+    <!-- CSS MANUAL: Agar background langsung hitam sebelum React loading -->
+    <style>
+      html, body {
+        background-color: #09090b; /* Warna hitam zinc */
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    
     <!-- JUDUL TAB BROWSER -->
     <title>Showcase Karya Siswa | SMP Terpadu Al-Ittihadiyah</title>
     <meta name="description" content="Platform galeri digital resmi karya siswa/i SMP Terpadu Al-Ittihadiyah. Menampilkan inovasi teknologi, seni, dan sains." />
 
     <!-- ========================================== -->
-    <!--  SETTING THUMBNAIL OTOMATIS (SCREENSHOT) -->
+    <!--  SETTING THUMBNAIL OTOMATIS (FIX BLANK) -->
     <!-- ========================================== -->
-    
+    <!-- 
+       PERBAIKAN:
+       Saya menambahkan '/wait/5' di URL image.thum.io
+       Artinya: "Tunggu 5 detik dulu biar website loading selesai, baru difoto"
+    -->
+
     <!-- 1. Facebook / WhatsApp / LinkedIn -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://showcase-karya-siswa-smp-terpadu-al-wine.vercel.app/" />
     <meta property="og:title" content="Karya Siswa/i SMP Terpadu Al-Ittihadiyah" />
     <meta property="og:description" content="Lihat karya-karya kreatif, inovasi robotik, dan seni digital dari siswa/i kami." />
     
-    <!-- API Screenshot Otomatis -->
-    <meta property="og:image" content="https://image.thum.io/get/width/1200/crop/630/noanimate/https://showcase-karya-siswa-smp-terpadu-al-wine.vercel.app/" />
+    <!-- API Screenshot dengan Waktu Tunggu 5 Detik -->
+    <meta property="og:image" content="https://image.thum.io/get/width/1200/crop/630/wait/5/noanimate/https://showcase-karya-siswa-smp-terpadu-al-wine.vercel.app/" />
 
     <!-- 2. Twitter (X) -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://showcase-karya-siswa-smp-terpadu-al-wine.vercel.app/" />
     <meta property="twitter:title" content="Karya Siswa/i SMP Terpadu Al-Ittihadiyah" />
     <meta property="twitter:description" content="Platform galeri digital resmi karya siswa/i SMP Terpadu Al-Ittihadiyah." />
-    <meta property="twitter:image" content="https://image.thum.io/get/width/1200/crop/630/noanimate/https://showcase-karya-siswa-smp-terpadu-al-wine.vercel.app/" />
+    <meta property="twitter:image" content="https://image.thum.io/get/width/1200/crop/630/wait/5/noanimate/https://showcase-karya-siswa-smp-terpadu-al-wine.vercel.app/" />
 
     <!-- Font Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
