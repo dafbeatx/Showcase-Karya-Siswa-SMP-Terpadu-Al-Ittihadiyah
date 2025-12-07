@@ -298,10 +298,10 @@ export default function App() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
           </span>
-          Showcase Resmi Tahun Ajaran 2024/2025
+          Showcase Resmi SMP Terpadu Al-Ittihadiyah
         </div>
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter mb-4 md:mb-6 leading-[1.15] md:leading-tight">
-          Karya <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">Siswa/i</span>, <br /> Masa Depan Kalian.
+          Karya <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">Siswa/i</span>, <br /> Untuk Masa Depan Kalian.
         </h1>
         <p className="text-gray-400 text-base md:text-xl max-w-2xl mx-auto mb-6 leading-relaxed px-2">
           Selamat datang di platform galeri digital SMP Terpadu Al-Ittihadiyah. Tempat kami merayakan kreativitas, inovasi teknologi, dan bakat seni dari seluruh siswa.
