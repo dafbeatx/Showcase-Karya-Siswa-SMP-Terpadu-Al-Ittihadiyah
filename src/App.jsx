@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  FolderOpen, ExternalLink, Search, Code, Palette, Beaker, 
+  FolderOpen, Search, Code, Palette, Beaker, 
   Menu, X, Plus, Loader2, Send, Edit3, Sparkles, ArrowRight,
   Phone, MapPin, Github, Youtube, Instagram, Heart, Copyright,
   Trash2, Image as ImageIcon, Link as LinkIcon, Upload, Lock, AlertTriangle
@@ -11,7 +11,7 @@ import {
   getFirestore, collection, addDoc, onSnapshot, serverTimestamp, deleteDoc, doc 
 } from 'firebase/firestore';
 import { 
-  getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged 
+  getAuth, signInAnonymously, onAuthStateChanged 
 } from 'firebase/auth';
 
 // --- CONFIG FIREBASE ---
@@ -57,12 +57,12 @@ export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  // State Modal Upload
+  // State Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [imageUploadMode, setImageUploadMode] = useState('link');
+  const [imageUploadMode, setImageUploadMode] = useState('file'); // Default 'file' local
   
-  // State Modal Hapus (Password)
+  // State Delete
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
   const [deletePassword, setDeletePassword] = useState("");
@@ -71,6 +71,9 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [isCustomCategory, setIsCustomCategory] = useState(false);
   
+  // State Files Lokal
+  const [localImageFiles, setLocalImageFiles] = useState([]); 
+
   const [formData, setFormData] = useState({
     title: '', student: '', category: 'Tech', image: '', desc: '', driveLink: '', tags: ''
   });
@@ -104,19 +107,43 @@ export default function App() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // --- HANDLE 2 FILES UPLOAD ---
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 800 * 1024) {
-      alert("Ukuran gambar terlalu besar! Harap pilih gambar di bawah 800KB.");
+    const files = Array.from(e.target.files);
+    
+    // Validasi Jumlah File
+    if (files.length === 0) return;
+    if (files.length > 2) {
+      alert("Maksimal hanya boleh upload 2 foto!");
       return;
     }
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFormData(prev => ({ ...prev, image: reader.result }));
-    };
-    reader.readAsDataURL(file);
+
+    const processedImages = [];
+    let processedCount = 0;
+
+    files.forEach(file => {
+      // Validasi Ukuran (Max 400KB per foto agar DB aman)
+      if (file.size > 400 * 1024) {
+        alert(`File ${file.name} terlalu besar! Maksimal 400KB.`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        processedImages.push(reader.result);
+        processedCount++;
+        
+        // Jika semua file sudah diproses
+        if (processedCount === files.length) {
+          setLocalImageFiles(processedImages); // Simpan array gambar
+          // Set preview gambar pertama dulu
+          setFormData(prev => ({ ...prev, image: processedImages[0] }));
+        }
+      };
+      reader.readAsDataURL(file);
+    });
   };
+
   const handleCategorySelect = (cat) => {
     if (cat === "Custom") {
       setIsCustomCategory(true);
@@ -127,14 +154,13 @@ export default function App() {
     }
   };
 
-  // --- TRIGGER DELETE MODAL ---
+  // --- DELETE LOGIC ---
   const requestDelete = (id) => {
     setProjectToDelete(id);
-    setDeletePassword(""); // Reset password field
+    setDeletePassword("");
     setIsDeleteModalOpen(true);
   };
 
-  // --- EXECUTE DELETE WITH PASSWORD ---
   const handleConfirmDelete = async (e) => {
     e.preventDefault();
     if (!projectToDelete) return;
@@ -152,7 +178,7 @@ export default function App() {
       setDeletePassword("");
     } catch (error) {
       console.error("Error deleting:", error);
-      alert("Gagal menghapus. Cek koneksi.");
+      alert("Gagal menghapus.");
     } finally {
       setIsDeleting(false);
     }
@@ -179,11 +205,20 @@ export default function App() {
       const formattedTags = formData.tags.split(',').map(t => t.trim()).filter(t => t);
       
       let finalImage = formData.image;
-      if (imageUploadMode === 'link' && finalImage.includes('drive.google.com')) {
+
+      // LOGIKA RANDOM THUMBNAIL (Jika Upload Lokal)
+      if (imageUploadMode === 'file' && localImageFiles.length > 0) {
+        // Acak index (0 atau 1)
+        const randomIndex = Math.floor(Math.random() * localImageFiles.length);
+        finalImage = localImageFiles[randomIndex]; // Ambil foto random sebagai cover
+      } 
+      // LOGIKA GOOGLE DRIVE
+      else if (imageUploadMode === 'link' && finalImage.includes('drive.google.com')) {
         finalImage = getGoogleDriveImgUrl(finalImage);
       }
       
-      if (!finalImage.trim()) {
+      // Fallback
+      if (!finalImage || !finalImage.trim()) {
         finalImage = 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop';
       }
 
@@ -191,15 +226,19 @@ export default function App() {
         ...formData,
         tags: formattedTags,
         image: finalImage,
+        // Kita bisa simpan array foto juga jika mau dikembangkan nanti
+        gallery: imageUploadMode === 'file' ? localImageFiles : [],
         createdAt: serverTimestamp()
       });
 
+      // Reset
       setFormData({ title: '', student: '', category: 'Tech', image: '', desc: '', driveLink: '', tags: '' });
+      setLocalImageFiles([]);
       setIsCustomCategory(false);
       setIsModalOpen(false);
     } catch (error) {
       console.error(error);
-      alert("Gagal upload.");
+      alert("Gagal upload. Mungkin ukuran file terlalu besar (Max total 1MB).");
     } finally {
       setIsSubmitting(false);
     }
@@ -302,21 +341,16 @@ export default function App() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {filteredProjects.map((p) => (
             <div key={p.id} className="group relative bg-[#18181b]/60 backdrop-blur-md border border-white/5 rounded-2xl md:rounded-3xl overflow-hidden hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:border-purple-500/20 flex flex-col">
-              {/* Image with Delete Button */}
               <div className="relative h-48 md:h-56 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-[#18181b] to-transparent z-10 opacity-60 group-hover:opacity-40 transition-opacity" />
                 <img src={p.image} alt={p.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" 
                      onError={(e) => e.target.src = 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop'} />
-                
-                {/* Category Badge */}
                 <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20">
                   <span className="px-2.5 py-1 text-[10px] md:text-xs font-bold uppercase rounded-full bg-black/50 border border-white/10 flex items-center gap-1.5 backdrop-blur-md">
                     {p.category === 'Tech' ? <Code size={10} className="text-blue-400"/> : p.category === 'Art' ? <Palette size={10} className="text-pink-400"/> : <Beaker size={10} className="text-green-400"/>}
                     {p.category}
                   </span>
                 </div>
-
-                {/* DELETE BUTTON: TRIGGER MODAL PASSWORD */}
                 <button 
                   onClick={(e) => { e.stopPropagation(); requestDelete(p.id); }}
                   className="absolute top-3 right-3 md:top-4 md:right-4 z-30 p-2 bg-red-600/80 hover:bg-red-600 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all hover:scale-110 shadow-lg"
@@ -325,7 +359,6 @@ export default function App() {
                   <Trash2 size={16} />
                 </button>
               </div>
-
               <div className="p-5 md:p-6 flex flex-col flex-grow">
                 <h3 className="text-lg md:text-xl font-bold mb-1 group-hover:text-purple-300 transition-colors">{p.title}</h3>
                 <p className="text-xs md:text-sm text-gray-400 mb-3 flex items-center gap-2"><span className="w-1 h-1 rounded-full bg-gray-500"></span> {p.student}</p>
@@ -340,7 +373,7 @@ export default function App() {
         {filteredProjects.length === 0 && <div className="text-center py-20 text-gray-500 flex flex-col items-center"><Sparkles className="mb-4 text-purple-500/50" size={48}/>Belum ada projek yang diupload.</div>}
       </section>
 
-      {/* FOOTER SECTION */}
+      {/* FOOTER */}
       <footer className="border-t border-white/10 bg-black/40 backdrop-blur-lg pt-16 pb-8 mt-auto">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
@@ -382,33 +415,21 @@ export default function App() {
         </div>
       </footer>
 
-      {/* --- MODAL CONFIRM DELETE (PASSWORD) --- */}
+      {/* --- MODAL CONFIRM DELETE --- */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center px-4 bg-black/90 backdrop-blur-sm animate-fade-in">
           <div className="w-full max-w-md bg-[#18181b] border border-red-500/30 rounded-2xl p-6 shadow-2xl shadow-red-900/20 relative">
             <button onClick={() => setIsDeleteModalOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-white"><X size={20}/></button>
-            
             <div className="flex flex-col items-center text-center mb-6">
-              <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4 text-red-500">
-                <AlertTriangle size={32} />
-              </div>
+              <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4 text-red-500"><AlertTriangle size={32} /></div>
               <h3 className="text-xl font-bold text-white mb-2">Hapus Projek?</h3>
               <p className="text-gray-400 text-sm">Tindakan ini tidak bisa dibatalkan. Masukkan password admin untuk konfirmasi.</p>
             </div>
-
             <form onSubmit={handleConfirmDelete} className="space-y-4">
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18}/>
-                <input 
-                  type="password" 
-                  value={deletePassword}
-                  onChange={(e) => setDeletePassword(e.target.value)}
-                  placeholder="Masukkan Password Admin"
-                  className="w-full bg-black/50 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white focus:border-red-500 outline-none transition-colors"
-                  autoFocus
-                />
+                <input type="password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} placeholder="Masukkan Password Admin" className="w-full bg-black/50 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white focus:border-red-500 outline-none transition-colors" autoFocus />
               </div>
-              
               <div className="flex gap-3">
                 <button type="button" onClick={() => setIsDeleteModalOpen(false)} className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-medium transition-colors">Batal</button>
                 <button type="submit" disabled={isDeleting} className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold flex items-center justify-center gap-2 transition-colors">
@@ -467,34 +488,48 @@ export default function App() {
                  <textarea required name="desc" value={formData.desc} onChange={handleInputChange} rows={3} placeholder="Ceritakan sedikit tentang karya ini..." className="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500 outline-none resize-none"/>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase ml-1">Link Google Drive</label>
+              {/* SECTION UPLOAD FOTO & DRIVE BERDERETAN */}
+              <div className="space-y-2 pt-2 border-t border-white/5 mt-2">
+                 <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase ml-1 mb-2 block">Upload Media (Cover & File)</label>
+                 
+                 {/* Pilihan Sumber Gambar Berderetan */}
+                 <div className="flex gap-3 mb-3">
+                    <button type="button" onClick={() => setImageUploadMode('file')} className={`flex-1 py-3 text-xs md:text-sm rounded-xl border flex items-center justify-center gap-2 transition-all ${imageUploadMode === 'file' ? 'bg-white text-black border-white shadow-lg' : 'bg-zinc-900 border-white/10 text-gray-400 hover:bg-zinc-800'}`}> 
+                      <ImageIcon size={16}/> Upload Galeri <span className="text-[9px] opacity-60 ml-1">(1-2 Foto)</span>
+                    </button>
+                    <button type="button" onClick={() => setImageUploadMode('link')} className={`flex-1 py-3 text-xs md:text-sm rounded-xl border flex items-center justify-center gap-2 transition-all ${imageUploadMode === 'link' ? 'bg-white text-black border-white shadow-lg' : 'bg-zinc-900 border-white/10 text-gray-400 hover:bg-zinc-800'}`}> 
+                      <LinkIcon size={16}/> Link Drive <span className="text-[9px] opacity-60 ml-1">(URL Gambar)</span>
+                    </button>
+                 </div>
+
+                 {/* Input Area Sesuai Pilihan */}
+                 <div className="animate-fade-in">
+                   {imageUploadMode === 'file' ? (
+                     <div className="relative group">
+                       <div className="absolute inset-0 bg-zinc-900/50 border-2 border-white/10 border-dashed rounded-xl flex flex-col items-center justify-center pointer-events-none group-hover:border-purple-500/50 transition-colors">
+                         <Upload size={24} className="text-gray-500 mb-2"/>
+                         <span className="text-gray-400 text-xs font-medium">Klik untuk pilih 1-2 Foto (Max 400KB)</span>
+                         {localImageFiles.length > 0 && <span className="text-green-400 text-[10px] mt-1 font-bold">{localImageFiles.length} foto terpilih!</span>}
+                       </div>
+                       <input type="file" accept="image/*" multiple onChange={handleFileChange} className="w-full h-24 opacity-0 cursor-pointer"/>
+                     </div>
+                   ) : (
+                     <div className="relative">
+                        <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16}/>
+                        <input name="image" value={formData.image} onChange={handleInputChange} placeholder="https://drive.google.com/file/d/..." className="w-full bg-zinc-900 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white focus:border-purple-500 outline-none text-xs md:text-sm"/>
+                        <p className="text-[9px] text-gray-500 mt-1 ml-2">*Pastikan akses file di Google Drive sudah 'Public' (Anyone with link).</p>
+                     </div>
+                   )}
+                 </div>
+              </div>
+
+              {/* Link Project Files (Drive) */}
+              <div className="space-y-1 mt-2">
+                <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase ml-1">Link File Projek (Drive/Github)</label>
                 <div className="relative">
                   <FolderOpen className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18}/>
                   <input required name="driveLink" value={formData.driveLink} onChange={handleInputChange} placeholder="https://drive.google.com/..." className="w-full bg-zinc-900 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-white focus:border-purple-500 outline-none"/>
                 </div>
-              </div>
-
-              {/* Upload Gambar (Pilih Mode) */}
-              <div className="space-y-2">
-                 <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase ml-1">Gambar Cover</label>
-                 <div className="flex gap-2 mb-2">
-                    <button type="button" onClick={() => setImageUploadMode('link')} className={`flex-1 py-2 text-xs rounded-lg border ${imageUploadMode === 'link' ? 'bg-white text-black border-white' : 'bg-zinc-900 border-white/10 text-gray-400'}`}> <LinkIcon className="inline mr-2" size={12}/> Link URL </button>
-                    <button type="button" onClick={() => setImageUploadMode('file')} className={`flex-1 py-2 text-xs rounded-lg border ${imageUploadMode === 'file' ? 'bg-white text-black border-white' : 'bg-zinc-900 border-white/10 text-gray-400'}`}> <ImageIcon className="inline mr-2" size={12}/> Upload File </button>
-                 </div>
-
-                 {imageUploadMode === 'link' ? (
-                   <input name="image" value={formData.image} onChange={handleInputChange} placeholder="https://..." className="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 outline-none text-xs md:text-sm"/>
-                 ) : (
-                   <div className="relative">
-                     <div className="absolute inset-0 bg-zinc-900 border border-white/10 border-dashed rounded-xl flex items-center justify-center pointer-events-none">
-                       <span className="text-gray-500 text-xs flex items-center gap-2"><Upload size={14}/> Pilih Gambar (Max 800KB)</span>
-                     </div>
-                     <input type="file" accept="image/*" onChange={handleFileChange} className="w-full h-12 opacity-0 cursor-pointer"/>
-                     {formData.image && formData.image.startsWith('data:') && <p className="text-[10px] text-green-400 mt-1 text-center">Gambar berhasil dipilih!</p>}
-                   </div>
-                 )}
-                 <p className="text-[10px] text-gray-600 italic">*Jika pakai URL Google Drive, pastikan aksesnya 'Public'.</p>
               </div>
 
               <div className="space-y-1">
@@ -502,7 +537,7 @@ export default function App() {
                  <input name="tags" value={formData.tags} onChange={handleInputChange} placeholder="Tags (misal: IoT, Web)" className="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-purple-500 outline-none text-xs md:text-sm"/>
               </div>
               
-              <button type="submit" disabled={isSubmitting} className="w-full py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 flex justify-center gap-2 transition-transform active:scale-95 disabled:opacity-50">
+              <button type="submit" disabled={isSubmitting} className="w-full py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 flex justify-center gap-2 transition-transform active:scale-95 disabled:opacity-50 shadow-lg shadow-white/5 mt-4">
                 {isSubmitting ? <Loader2 className="animate-spin"/> : <Send size={18}/>} Submit Sekarang
               </button>
             </form>
