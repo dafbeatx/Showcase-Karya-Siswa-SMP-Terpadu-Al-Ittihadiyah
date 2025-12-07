@@ -3,7 +3,7 @@ import {
   FolderOpen, ExternalLink, Search, Code, Palette, Beaker, 
   Menu, X, Plus, Loader2, Send, Edit3, Sparkles, ArrowRight,
   Phone, MapPin, Github, Youtube, Instagram, Heart, Copyright,
-  Trash2, Image as ImageIcon, Link as LinkIcon, Upload
+  Trash2, Image as ImageIcon, Link as LinkIcon, Upload, Lock, AlertTriangle
 } from 'lucide-react';
 
 import { initializeApp } from 'firebase/app';
@@ -56,13 +56,20 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // State Modal Upload
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imageUploadMode, setImageUploadMode] = useState('link');
+  
+  // State Modal Hapus (Password)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const [user, setUser] = useState(null);
   const [isCustomCategory, setIsCustomCategory] = useState(false);
-  
-  // State untuk mode upload gambar (Link atau File)
-  const [imageUploadMode, setImageUploadMode] = useState('link'); // 'link' or 'file'
   
   const [formData, setFormData] = useState({
     title: '', student: '', category: 'Tech', image: '', desc: '', driveLink: '', tags: ''
@@ -97,23 +104,19 @@ export default function App() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // --- HANDLE FILE UPLOAD (LOCAL) ---
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     if (file.size > 800 * 1024) {
       alert("Ukuran gambar terlalu besar! Harap pilih gambar di bawah 800KB.");
       return;
     }
-
     const reader = new FileReader();
     reader.onloadend = () => {
       setFormData(prev => ({ ...prev, image: reader.result }));
     };
     reader.readAsDataURL(file);
   };
-
   const handleCategorySelect = (cat) => {
     if (cat === "Custom") {
       setIsCustomCategory(true);
@@ -124,15 +127,34 @@ export default function App() {
     }
   };
 
-  // --- HANDLE DELETE (LANGSUNG HAPUS TANPA KONFIRMASI) ---
-  const handleDelete = async (id) => {
-    // UPDATED: Langsung hapus tanpa window.confirm
+  // --- TRIGGER DELETE MODAL ---
+  const requestDelete = (id) => {
+    setProjectToDelete(id);
+    setDeletePassword(""); // Reset password field
+    setIsDeleteModalOpen(true);
+  };
+
+  // --- EXECUTE DELETE WITH PASSWORD ---
+  const handleConfirmDelete = async (e) => {
+    e.preventDefault();
+    if (!projectToDelete) return;
+
+    if (deletePassword !== "Smpterpadualittihadiyah.12345") {
+      alert("Password Salah! Akses Ditolak.");
+      return;
+    }
+
+    setIsDeleting(true);
     try {
-      await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'projects', id));
-      // Opsional: Bisa kasih notifikasi kecil (toast) jika mau, tapi ini sudah cukup
+      await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'projects', projectToDelete));
+      setIsDeleteModalOpen(false);
+      setProjectToDelete(null);
+      setDeletePassword("");
     } catch (error) {
       console.error("Error deleting:", error);
-      alert("Gagal menghapus. Cek permission.");
+      alert("Gagal menghapus. Cek koneksi.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -240,7 +262,7 @@ export default function App() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
           </span>
-          Showcase Resmi SMP Terpadu Al-Ittihadiyah
+          Showcase Resmi Tahun Ajaran 2024/2025
         </div>
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter mb-4 md:mb-6 leading-[1.15] md:leading-tight">
           Karya <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">Siswa/i</span>, <br /> Masa Depan Kalian.
@@ -249,7 +271,7 @@ export default function App() {
           Selamat datang di platform galeri digital SMP Terpadu Al-Ittihadiyah. Tempat kami merayakan kreativitas, inovasi teknologi, dan bakat seni dari seluruh siswa.
         </p>
 
-        {/* UPDATED: TOMBOL SUBMIT DI HERO (VISIBLE ON MOBILE) */}
+        {/* TOMBOL SUBMIT DI HERO (VISIBLE ON MOBILE) */}
         <div className="flex justify-center mb-8 md:hidden">
           <button 
             onClick={() => setIsModalOpen(true)}
@@ -294,9 +316,9 @@ export default function App() {
                   </span>
                 </div>
 
-                {/* DELETE BUTTON (Hidden by default, show on hover) */}
+                {/* DELETE BUTTON: TRIGGER MODAL PASSWORD */}
                 <button 
-                  onClick={(e) => { e.stopPropagation(); handleDelete(p.id); }}
+                  onClick={(e) => { e.stopPropagation(); requestDelete(p.id); }}
                   className="absolute top-3 right-3 md:top-4 md:right-4 z-30 p-2 bg-red-600/80 hover:bg-red-600 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all hover:scale-110 shadow-lg"
                   title="Hapus Projek"
                 >
@@ -341,7 +363,7 @@ export default function App() {
               <div className="flex flex-wrap gap-3">
                 <a href="https://github.com/dafbeatx" target="_blank" rel="noreferrer" className="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-white hover:text-black transition-all hover:-translate-y-1"><Github size={18} /></a>
                 <a href="https://youtube.com/@smpterpadualittihadiyahbogor?si=ZREUlBQW8hNF9ja1" target="_blank" rel="noreferrer" className="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-red-600 hover:text-white transition-all hover:-translate-y-1"><Youtube size={18} /></a>
-                <a href="https://www.instagram.com/smpterpadu_alittihadiyah?igsh=MXJobTRwbHhyc2VwNA==" target="_blank" rel="noreferrer" className="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-gradient-to-tr hover:from-yellow-500 hover:via-purple-500 hover:to-pink-500 hover:text-white transition-all hover:-translate-y-1"><Instagram size={18} /></a>
+                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="h-10 w-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-gradient-to-tr hover:from-yellow-500 hover:via-purple-500 hover:to-pink-500 hover:text-white transition-all hover:-translate-y-1"><Instagram size={18} /></a>
               </div>
             </div>
             <div className="space-y-4">
@@ -360,7 +382,45 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Modal Submit (Mobile Optimized) */}
+      {/* --- MODAL CONFIRM DELETE (PASSWORD) --- */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center px-4 bg-black/90 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md bg-[#18181b] border border-red-500/30 rounded-2xl p-6 shadow-2xl shadow-red-900/20 relative">
+            <button onClick={() => setIsDeleteModalOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-white"><X size={20}/></button>
+            
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4 text-red-500">
+                <AlertTriangle size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Hapus Projek?</h3>
+              <p className="text-gray-400 text-sm">Tindakan ini tidak bisa dibatalkan. Masukkan password admin untuk konfirmasi.</p>
+            </div>
+
+            <form onSubmit={handleConfirmDelete} className="space-y-4">
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18}/>
+                <input 
+                  type="password" 
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  placeholder="Masukkan Password Admin"
+                  className="w-full bg-black/50 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white focus:border-red-500 outline-none transition-colors"
+                  autoFocus
+                />
+              </div>
+              
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setIsDeleteModalOpen(false)} className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-medium transition-colors">Batal</button>
+                <button type="submit" disabled={isDeleting} className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold flex items-center justify-center gap-2 transition-colors">
+                  {isDeleting ? <Loader2 className="animate-spin" size={18}/> : <Trash2 size={18}/>} Hapus
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- MODAL UPLOAD --- */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center px-0 md:px-4 bg-black/80 backdrop-blur-sm animate-fade-in">
           <div className="w-full max-w-2xl bg-[#121214] border-t md:border border-white/10 rounded-t-3xl md:rounded-3xl p-6 md:p-8 h-[85vh] md:max-h-[90vh] overflow-y-auto relative shadow-2xl shadow-purple-900/20">
