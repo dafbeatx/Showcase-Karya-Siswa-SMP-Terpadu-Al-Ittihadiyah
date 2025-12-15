@@ -262,6 +262,8 @@ setStatus("Menghubungkan ke server...");
         finalImage = 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop';
       }
 
+setIsSubmitting(true);
+
 addDoc(
   collection(db, 'artifacts', APP_ID, 'public', 'data', 'projects'),
   {
@@ -269,16 +271,34 @@ addDoc(
     tags: formattedTags,
     image: finalImage,
     gallery: imageUploadMode === 'file' ? localImageFiles : [],
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
   }
 )
-.then(() => {
-  console.log("WRITE OK: Data berhasil masuk Firestore");
-})
-.catch((err) => {
-  console.error("WRITE FAIL:", err.code, err.message);
-  alert("WRITE FAIL: " + err.code);
-});
+  .then(() => {
+    console.log("WRITE OK: Data berhasil masuk Firestore");
+
+    // reset form & tutup modal kalau mau
+    setFormData({
+      title: '',
+      student: '',
+      category: 'Tech',
+      image: '',
+      desc: '',
+      driveLink: '',
+      tags: ''
+    });
+    setLocalImageFiles([]);
+    setIsCustomCategory(false);
+    setIsModalOpen(false);
+  })
+  .catch((err) => {
+    console.error("WRITE FAIL:", err.code, err.message);
+    alert("WRITE FAIL: " + err.code);
+  })
+  .finally(() => {
+    // ⬅️ INI KUNCI BIAR GA MUTER TERUS
+    setIsSubmitting(false);
+  });
 
 
       setFormData({ title: '', student: '', category: 'Tech', image: '', desc: '', driveLink: '', tags: '' });
