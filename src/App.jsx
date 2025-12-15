@@ -238,7 +238,8 @@ useEffect(() => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!user) return alert("Menunggu koneksi...");
+    setIsSubmitting(true);
+setStatus("Menghubungkan ke server...");
     if (!formData.category.trim()) return alert("Isi kategori!");
     if (isProcessingImg) return alert("Tunggu sebentar, sedang memproses gambar...");
 
