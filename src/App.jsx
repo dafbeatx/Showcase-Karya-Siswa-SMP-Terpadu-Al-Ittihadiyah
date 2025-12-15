@@ -24,7 +24,6 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-
 let app;
 try {
   app = initializeApp(firebaseConfig);
@@ -115,11 +114,24 @@ export default function App() {
     title: '', student: '', category: 'Tech', image: '', desc: '', driveLink: '', tags: ''
   });
 
-  useEffect(() => {
-    signInAnonymously(auth).catch((error) => console.error(error));
-    const unsubscribe = onAuthStateChanged(auth, setUser);
-    return () => unsubscribe();
-  }, []);
+useEffect(() => {
+  signInAnonymously(auth)
+    .then(() => {
+      console.log("AUTH OK: Anonymous login berhasil");
+    })
+    .catch((error) => {
+      console.error("AUTH FAIL:", error.code, error.message);
+      alert("AUTH FAIL: " + error.code);
+    });
+
+  const unsubscribe = onAuthStateChanged(auth, (u) => {
+    console.log("AUTH STATE:", u);
+    setUser(u);
+  });
+
+  return () => unsubscribe();
+}, []);
+
 
   useEffect(() => {
     const projectsRef = collection(db, 'artifacts', APP_ID, 'public', 'data', 'projects');
@@ -249,13 +261,24 @@ export default function App() {
         finalImage = 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070&auto=format&fit=crop';
       }
 
-      addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', 'projects'), {
-        ...formData,
-        tags: formattedTags,
-        image: finalImage,
-        gallery: imageUploadMode === 'file' ? localImageFiles : [],
-        createdAt: serverTimestamp()
-      }).catch((err) => alert("Gagal upload di background. Cek koneksi."));
+addDoc(
+  collection(db, 'artifacts', APP_ID, 'public', 'data', 'projects'),
+  {
+    ...formData,
+    tags: formattedTags,
+    image: finalImage,
+    gallery: imageUploadMode === 'file' ? localImageFiles : [],
+    createdAt: serverTimestamp()
+  }
+)
+.then(() => {
+  console.log("WRITE OK: Data berhasil masuk Firestore");
+})
+.catch((err) => {
+  console.error("WRITE FAIL:", err.code, err.message);
+  alert("WRITE FAIL: " + err.code);
+});
+
 
       setFormData({ title: '', student: '', category: 'Tech', image: '', desc: '', driveLink: '', tags: '' });
       setLocalImageFiles([]);
