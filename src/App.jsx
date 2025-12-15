@@ -14,16 +14,16 @@ import {
   getAuth, signInAnonymously, onAuthStateChanged 
 } from 'firebase/auth';
 
-// --- CONFIG FIREBASE ---
 const firebaseConfig = {
-  apiKey: "AIzaSyDwu4HV63wOXwJjrcBUnRQY_NCa8rU2woo",
-  authDomain: "dafbeatx-project.firebaseapp.com",
-  projectId: "dafbeatx-project",
-  storageBucket: "dafbeatx-project.firebasestorage.app",
-  messagingSenderId: "685029378988",
-  appId: "1:685029378988:web:9d5d5a82be5bba6a000809",
-  measurementId: "G-0G43FJ0T44"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
+
 
 let app;
 try {
