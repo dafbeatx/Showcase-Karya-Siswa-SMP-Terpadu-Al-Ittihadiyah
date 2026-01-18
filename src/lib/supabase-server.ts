@@ -6,8 +6,12 @@ export async function createClient() {
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     if (!supabaseUrl || !supabaseAnonKey) {
-        console.error('CRITICAL ERROR: Supabase environment variables are missing!')
-        throw new Error('Supabase configurations are missing. Please check your environment variables.')
+        if (process.env.NODE_ENV === 'production') {
+            console.error('ERROR: Supabase Environment Variables are missing in Production!')
+        }
+        // Instead of throwing immediately, we'll try to continue or let the caller handle it.
+        // But createServerClient requires them.
+        return null as any;
     }
 
     const cookieStore = await cookies()

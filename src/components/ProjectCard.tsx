@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { Code, Palette, Beaker, Trash2, FolderOpen } from 'lucide-react';
 import Image from 'next/image';

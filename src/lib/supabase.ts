@@ -5,11 +5,14 @@ export function createClient() {
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     if (!supabaseUrl || !supabaseAnonKey) {
-        console.error('CRITICAL ERROR: Supabase environment variables are missing (Browser Client)!')
+        if (typeof window !== 'undefined') {
+            console.error('Supabase key or URL is missing in Browser!');
+        }
+        return null as any;
     }
 
     return createBrowserClient(
-        supabaseUrl!,
-        supabaseAnonKey!
+        supabaseUrl,
+        supabaseAnonKey
     )
 }

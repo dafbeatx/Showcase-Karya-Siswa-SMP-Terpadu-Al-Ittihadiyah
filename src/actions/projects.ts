@@ -5,6 +5,12 @@ import { revalidatePath } from 'next/cache';
 
 export async function getProjects() {
     const supabase = await createClient();
+
+    if (!supabase) {
+        console.error('Supabase client failed to initialize. Check your env variables.');
+        return [];
+    }
+
     const { data, error } = await supabase
         .from('student_projects')
         .select('*')
@@ -19,6 +25,8 @@ export async function getProjects() {
 
 export async function uploadProject(formData: any) {
     const supabase = await createClient();
+
+    if (!supabase) throw new Error('Konfigurasi Supabase tidak ditemukan.');
 
     const { data, error } = await supabase
         .from('student_projects')
@@ -45,6 +53,8 @@ export async function uploadProject(formData: any) {
 
 export async function deleteProject(id: string) {
     const supabase = await createClient();
+
+    if (!supabase) throw new Error('Konfigurasi Supabase tidak ditemukan.');
     const { error } = await supabase
         .from('student_projects')
         .delete()
@@ -59,6 +69,8 @@ export async function deleteProject(id: string) {
 
 export async function uploadImage(file: File) {
     const supabase = await createClient();
+
+    if (!supabase) throw new Error('Konfigurasi Supabase tidak ditemukan.');
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random()}.${fileExt}`;
     const filePath = `${fileName}`;
