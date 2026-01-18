@@ -7,8 +7,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Showcase Karya Siswa | SMP Terpadu Al-Ittihadiyah",
-  description: "Galeri digital untuk merayakan kreativitas dan inovasi siswa SMP Terpadu Al-Ittihadiyah.",
+  title: "Portal Berita | SMP Terpadu Al-Ittihadiyah",
+  description: "Dapatkan informasi terbaru, berita kegiatan, dan prestasi siswa dari SMP Terpadu Al-Ittihadiyah.",
 };
 
 export default function RootLayout({

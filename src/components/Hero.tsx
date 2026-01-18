@@ -32,20 +32,20 @@ export default function Hero({
                 Showcase Resmi SMP Terpadu Al-Ittihadiyah
             </div>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter mb-4 md:mb-6 leading-[1.15] md:leading-tight">
-                Karya <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">Siswa/i</span>, <br /> Untuk Masa Depan Kalian.
+                Portal <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">Berita</span> & <br /> Kegiatan Sekolah.
             </h1>
             <p className="text-gray-400 text-base md:text-xl max-w-2xl mx-auto mb-6 leading-relaxed px-2">
-                Selamat datang di platform galeri digital SMP Terpadu Al-Ittihadiyah. Tempat kami merayakan kreativitas, inovasi teknologi, dan bakat seni dari seluruh siswa.
+                Informasi terkini mengenai kegiatan, prestasi, dan pengumuman resmi dari SMP Terpadu Al-Ittihadiyah.
             </p>
 
-            {/* TOMBOL SUBMIT DI HERO (VISIBLE ON MOBILE) */}
+            {/* TOMBOL LIHAT BERITA DI HERO (VISIBLE ON MOBILE) */}
             <div className="flex justify-center mb-8 md:hidden">
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="px-6 py-3 bg-white text-black font-bold rounded-full flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.3)] animate-pulse hover:scale-105 transition-transform"
+                <a
+                    href="#berita-terbaru"
+                    className="px-6 py-3 bg-white text-black font-bold rounded-full flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-105 transition-transform"
                 >
-                    <Plus size={18} /> Upload Karyamu
-                </button>
+                    Lihat Berita Terbaru
+                </a>
             </div>
 
             <form onSubmit={handleSearchSubmit} className="relative w-full max-w-xl mx-auto mb-6 md:mb-8 group px-2">

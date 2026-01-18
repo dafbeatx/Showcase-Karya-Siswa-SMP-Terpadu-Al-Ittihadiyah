@@ -14,7 +14,7 @@ export default function Footer() {
                             </div>
                             <span className="font-bold text-lg">SMP Terpadu Al-Ittihadiyah</span>
                         </div>
-                        <p className="text-gray-400 text-sm leading-relaxed">Platform showcase karya digital siswa untuk menginspirasi dan berinovasi di era teknologi.</p>
+                        <p className="text-gray-400 text-sm leading-relaxed">Portal berita dan informasi resmi SMP Terpadu Al-Ittihadiyah. Tetap terhubung dengan perkembangan terbaru di sekolah kami.</p>
                     </div>
                     <div className="space-y-4">
                         <h3 className="font-bold text-white">Hubungi Kami</h3>
