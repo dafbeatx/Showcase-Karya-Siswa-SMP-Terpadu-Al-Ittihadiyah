@@ -21,6 +21,7 @@ export default function Home() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   const categories = ['All', 'Tech', 'Art', 'Science'];
 
@@ -48,11 +49,17 @@ export default function Home() {
 
   async function fetchProjects() {
     setIsLoading(true);
+    setHasError(false);
     try {
       const data = await getProjects();
-      setProjects(data);
+      if (data) {
+        setProjects(data);
+      } else {
+        setHasError(true);
+      }
     } catch (error) {
       console.error(error);
+      setHasError(true);
     } finally {
       setIsLoading(false);
     }
@@ -113,6 +120,16 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center py-32 gap-4">
               <Loader2 className="animate-spin text-purple-500" size={40} />
               <p className="text-gray-500 font-medium animate-pulse text-sm">Memuat mahakarya siswa...</p>
+            </div>
+          ) : hasError ? (
+            <div className="text-center py-24 bg-red-500/5 rounded-3xl border border-red-500/10 flex flex-col items-center gap-4">
+              <p className="text-red-400 font-medium">Gagal memuat data dari server.</p>
+              <button
+                onClick={() => fetchProjects()}
+                className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-bold transition-all"
+              >
+                Coba Lagi
+              </button>
             </div>
           ) : filteredProjects.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 animate-fade-in">
