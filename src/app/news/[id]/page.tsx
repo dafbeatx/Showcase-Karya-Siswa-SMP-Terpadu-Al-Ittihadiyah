@@ -95,6 +95,12 @@ export default function NewsDetail() {
                         />
                     </div>
 
+                    {post.image_source && (
+                        <p className="text-gray-500 text-xs italic -mt-10 mb-10 text-right pr-4">
+                            Sumber: {post.image_source}
+                        </p>
+                    )}
+
                     <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-12 items-start">
                         <div className="prose prose-invert max-w-none">
                             {post.content.split('\n').map((para: string, i: number) => (

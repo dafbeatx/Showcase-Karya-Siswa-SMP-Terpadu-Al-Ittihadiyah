@@ -36,7 +36,7 @@ export async function getNewsPostById(id: string) {
     return data;
 }
 
-export async function uploadNewsPost(formData: { title: string; content: string; image_url: string }) {
+export async function uploadNewsPost(formData: { title: string; content: string; image_url: string; image_source?: string }) {
     const supabase = await createClient();
     if (!supabase) throw new Error('Konfigurasi Supabase tidak ditemukan.');
 
@@ -47,11 +47,13 @@ export async function uploadNewsPost(formData: { title: string; content: string;
                 title: formData.title,
                 content: formData.content,
                 image_url: formData.image_url,
+                image_source: formData.image_source || '',
             },
         ]);
 
     if (error) {
-        throw new Error(error.message);
+        console.error('Database Insert Error:', error);
+        throw new Error('Gagal menyimpan data berita ke database: ' + error.message);
     }
 
     revalidatePath('/');

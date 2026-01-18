@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { uploadNewsPost, uploadNewsImage, getNewsPosts, deleteNewsPost } from '@/actions/news';
-import { Sparkles, Send, Loader2, ImageIcon, Trash2, Calendar, FileText } from 'lucide-react';
+import { Sparkles, Send, Loader2, ImageIcon, Trash2, Calendar, FileText, AlertCircle, CheckCircle2, X } from 'lucide-react';
 import Image from 'next/image';
+import { compressImage } from '@/utils/helpers';
 
 export default function AdminPage() {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -16,10 +17,17 @@ export default function AdminPage() {
     const [password, setPassword] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+    // Status Notification State
+    const [status, setStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({
+        type: null,
+        message: ''
+    });
+
     const [formData, setFormData] = useState({
         title: '',
         content: '',
-        image_url: ''
+        image_url: '',
+        image_source: ''
     });
 
     useEffect(() => {
@@ -28,6 +36,11 @@ export default function AdminPage() {
         fetchNews();
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    const showStatus = (type: 'success' | 'error', message: string) => {
+        setStatus({ type, message });
+        setTimeout(() => setStatus({ type: null, message: '' }), 5000);
+    };
 
     async function fetchNews() {
         setIsLoading(true);
@@ -44,7 +57,7 @@ export default function AdminPage() {
         if (password === 'Smpterpadualittihadiyah.12345') {
             setIsAuthenticated(true);
         } else {
-            alert('Password salah!');
+            showStatus('error', 'Password yang Anda masukkan salah.');
         }
     };
 
@@ -54,10 +67,20 @@ export default function AdminPage() {
 
         setIsUploadingImg(true);
         try {
-            const url = await uploadNewsImage(file);
+            // 1. Client-side compression
+            let finalFile: File = file;
+            if (file.size > 1 * 1024 * 1024) { // If > 1MB, compress
+                const compressedBlob = await compressImage(file);
+                finalFile = new File([compressedBlob], file.name, { type: 'image/jpeg' });
+            }
+
+            // 2. Upload to Supabase (via Server Action)
+            const url = await uploadNewsImage(finalFile);
             setFormData(prev => ({ ...prev, image_url: url }));
+            showStatus('success', 'Gambar berhasil diunggah dan dikompres.');
         } catch (error: any) {
-            alert('Gagal upload gambar: ' + error.message);
+            console.error(error);
+            showStatus('error', 'Gagal upload gambar: ' + (error.message || 'Terjadi kesalahan sistem.'));
         } finally {
             setIsUploadingImg(false);
         }
@@ -65,16 +88,16 @@ export default function AdminPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.image_url) return alert('Silakan upload foto terlebih dahulu!');
+        if (!formData.image_url) return showStatus('error', 'Silakan upload foto berita terlebih dahulu.');
 
         setIsSubmitting(true);
         try {
             await uploadNewsPost(formData);
-            alert('Berita berhasil diterbitkan!');
-            setFormData({ title: '', content: '', image_url: '' });
+            showStatus('success', 'Berita berhasil diterbitkan!');
+            setFormData({ title: '', content: '', image_url: '', image_source: '' });
             fetchNews();
         } catch (error: any) {
-            alert('Gagal menerbitkan berita: ' + error.message);
+            showStatus('error', 'Gagal menerbitkan: ' + error.message);
         } finally {
             setIsSubmitting(false);
         }
@@ -84,15 +107,26 @@ export default function AdminPage() {
         if (!confirm('Yakin ingin menghapus berita ini?')) return;
         try {
             await deleteNewsPost(id);
+            showStatus('success', 'Berita telah dihapus.');
             fetchNews();
         } catch (error: any) {
-            alert('Gagal menghapus: ' + error.message);
+            showStatus('error', 'Gagal menghapus: ' + error.message);
         }
     };
 
     if (!isAuthenticated) {
         return (
-            <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center p-6">
+            <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center p-6 relative">
+                {/* Status Notification */}
+                {status.type && (
+                    <div className={`fixed top-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl border backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-300 ${status.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-red-500/10 border-red-500/20 text-red-400'
+                        }`}>
+                        {status.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+                        <span className="text-sm font-bold">{status.message}</span>
+                        <button onClick={() => setStatus({ type: null, message: '' })} className="ml-4 hover:opacity-70"><X size={16} /></button>
+                    </div>
+                )}
+
                 <form onSubmit={handleLogin} className="w-full max-w-sm space-y-6">
                     <div className="text-center space-y-2 mb-8">
                         <h1 className="text-3xl font-bold">Admin Login</h1>
@@ -115,8 +149,18 @@ export default function AdminPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#09090b] text-white">
+        <div className="min-h-screen bg-[#09090b] text-white selection:bg-purple-500/30">
             <Navbar isScrolled={isScrolled} mobileMenuOpen={false} setMobileMenuOpen={() => { }} setIsModalOpen={() => { }} />
+
+            {/* Status Notification */}
+            {status.type && (
+                <div className={`fixed top-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl border backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300 ${status.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-red-500/10 border-red-500/20 text-red-500'
+                    }`}>
+                    {status.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+                    <span className="text-sm font-bold">{status.message}</span>
+                    <button onClick={() => setStatus({ type: null, message: '' })} className="ml-4 hover:opacity-70"><X size={16} /></button>
+                </div>
+            )}
 
             <main className="pt-32 pb-24 max-w-7xl mx-auto px-4 md:px-6">
                 <div className="grid lg:grid-cols-[1fr_400px] gap-12 items-start">
@@ -149,7 +193,7 @@ export default function AdminPage() {
                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Konten Lengkap</label>
                                 <textarea
                                     required
-                                    rows={10}
+                                    rows={8}
                                     value={formData.content}
                                     onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
                                     placeholder="Tuliskan berita lengkap di sini..."
@@ -157,28 +201,41 @@ export default function AdminPage() {
                                 />
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Foto Utama</label>
-                                <div className="relative group overflow-hidden rounded-2xl border-2 border-white/5 border-dashed hover:border-purple-500/50 transition-all aspect-video flex flex-col items-center justify-center bg-black/20">
-                                    {isUploadingImg ? (
-                                        <div className="flex flex-col items-center gap-2">
-                                            <Loader2 className="animate-spin text-purple-500" />
-                                            <span className="text-xs text-gray-500">Mengunggah...</span>
-                                        </div>
-                                    ) : formData.image_url ? (
-                                        <div className="relative w-full h-full">
-                                            <Image src={formData.image_url} alt="Preview" fill className="object-cover" />
-                                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button type="button" onClick={() => setFormData(prev => ({ ...prev, image_url: '' }))} className="bg-red-500 p-3 rounded-full"><Trash2 size={20} /></button>
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Foto Utama</label>
+                                    <div className="relative group overflow-hidden rounded-2xl border-2 border-white/5 border-dashed hover:border-purple-500/50 transition-all aspect-video flex flex-col items-center justify-center bg-black/20">
+                                        {isUploadingImg ? (
+                                            <div className="flex flex-col items-center gap-2">
+                                                <Loader2 className="animate-spin text-purple-500" />
+                                                <span className="text-xs text-gray-500">Mengunggah & Kompres...</span>
                                             </div>
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-col items-center gap-3 text-gray-500">
-                                            <ImageIcon size={40} />
-                                            <span className="text-sm">Klik untuk upload foto berita</span>
-                                        </div>
-                                    )}
-                                    <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer" disabled={isUploadingImg} />
+                                        ) : formData.image_url ? (
+                                            <div className="relative w-full h-full">
+                                                <Image src={formData.image_url} alt="Preview" fill className="object-cover" />
+                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button type="button" onClick={() => setFormData(prev => ({ ...prev, image_url: '' }))} className="bg-red-500 p-3 rounded-full"><Trash2 size={20} /></button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col items-center gap-3 text-gray-500">
+                                                <ImageIcon size={40} />
+                                                <span className="text-sm">Klik untuk upload foto</span>
+                                            </div>
+                                        )}
+                                        <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer" disabled={isUploadingImg} />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Sumber Foto (Opsional)</label>
+                                    <input
+                                        value={formData.image_source}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, image_source: e.target.value }))}
+                                        placeholder="Contoh: Dokumentasi OSIS"
+                                        className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-white focus:border-purple-500 outline-none transition-all"
+                                    />
+                                    <p className="text-[10px] text-gray-500 ml-1">Akan ditampilkan di bawah foto berita.</p>
                                 </div>
                             </div>
 
