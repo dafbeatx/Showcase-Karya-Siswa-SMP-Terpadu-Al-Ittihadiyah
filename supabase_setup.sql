@@ -1,8 +1,7 @@
--- ==========================================
--- SUPABASE DATABASE SETUP (SQL Editor)
--- ==========================================
+-- SUPABASE SETUP SCRIPT FOR SCHOOL NEWS PORTAL
+-- Run this in your Supabase SQL Editor
 
--- 1. Create news_posts table (Add is_featured)
+-- 1. Create the news_posts table if not exists
 CREATE TABLE IF NOT EXISTS public.news_posts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT NOT NULL,
@@ -13,65 +12,61 @@ CREATE TABLE IF NOT EXISTS public.news_posts (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- If table already exists, add column safely
-DO $$ 
-BEGIN 
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='news_posts' AND column_name='is_featured') THEN
-        ALTER TABLE public.news_posts ADD COLUMN is_featured BOOLEAN DEFAULT FALSE;
-    END IF;
-END $$;
-
--- 2. Enable Row Level Security
+-- 2. Enable Row Level Security (RLS)
 ALTER TABLE public.news_posts ENABLE ROW LEVEL SECURITY;
 
--- 3. Policy: Public can view news (SELECT)
+-- 3. DROP existing policies to avoid conflicts
 DROP POLICY IF EXISTS "Public can view news" ON public.news_posts;
+DROP POLICY IF EXISTS "Anyone can insert news" ON public.news_posts;
+DROP POLICY IF EXISTS "Admins can update news" ON public.news_posts;
+DROP POLICY IF EXISTS "Admins can delete news" ON public.news_posts;
+
+-- 4. CREATE Policies
+-- Anyone (Public) can read news
 CREATE POLICY "Public can view news" 
 ON public.news_posts FOR SELECT 
 USING (true);
 
--- 4. Policy: Anyone can insert news (INSERT)
-DROP POLICY IF EXISTS "Anyone can insert news" ON public.news_posts;
+-- Anyone (Public) can post news (as per user request "All user boleh posting")
 CREATE POLICY "Anyone can insert news" 
 ON public.news_posts FOR INSERT 
 WITH CHECK (true);
 
--- 5. Policy: ONLY AUTHENTICATED can update news (UPDATE)
-DROP POLICY IF EXISTS "Admins can update news" ON public.news_posts;
+-- ONLY Authenticated Admins can update/edit news
 CREATE POLICY "Admins can update news" 
 ON public.news_posts FOR UPDATE 
 USING (auth.role() = 'authenticated');
 
--- 6. Policy: ONLY AUTHENTICATED can delete news (DELETE)
-DROP POLICY IF EXISTS "Admins can delete news" ON public.news_posts;
+-- ONLY Authenticated Admins can delete news
 CREATE POLICY "Admins can delete news" 
 ON public.news_posts FOR DELETE 
 USING (auth.role() = 'authenticated');
 
+-- 5. STORAGE BUCKET SETUP
+-- Ensure you have a bucket named 'school-news'
+-- Run these in your SQL editor if you want to set policies via SQL
 
--- ==========================================
--- SUPABASE STORAGE SETUP (SQL Editor)
--- ==========================================
-
--- 1. Create 'school-news' bucket
-INSERT INTO storage.buckets (id, name, public) 
-VALUES ('school-news', 'school-news', true)
-ON CONFLICT (id) DO NOTHING;
-
--- 2. Storage Policy: Allow public to view files
-DROP POLICY IF EXISTS "Public Read Access" ON storage.objects;
+-- Allow public to read images
 CREATE POLICY "Public Read Access" 
 ON storage.objects FOR SELECT 
-USING ( bucket_id = 'school-news' );
+USING (bucket_id = 'school-news');
 
--- 3. Storage Policy: Allow anyone to upload files
-DROP POLICY IF EXISTS "Public Upload Access" ON storage.objects;
-CREATE POLICY "Public Upload Access" 
+-- Allow anyone to upload images (since anyone can post news)
+CREATE POLICY "Anyone can upload images" 
 ON storage.objects FOR INSERT 
-WITH CHECK ( bucket_id = 'school-news' );
+WITH CHECK (bucket_id = 'school-news');
 
--- 4. Storage Policy: Allow ONLY AUTHENTICATED to update/delete
-DROP POLICY IF EXISTS "Admins can manage files" ON storage.objects;
-CREATE POLICY "Admins can manage files"
-ON storage.objects FOR ALL
-USING ( bucket_id = 'school-news' AND auth.role() = 'authenticated' );
+-- Only admins can delete/update images
+CREATE POLICY "Admins can manage images" 
+ON storage.objects FOR ALL 
+USING (bucket_id = 'school-news' AND auth.role() = 'authenticated');
+
+/*
+INSTRUCTIONS FOR ADMIN ACCOUNT:
+1. Go to Supabase Dashboard -> Authentication -> Users.
+2. Click "Add User" -> "Create new user".
+3. Enter:
+   Email: dafanakalbho75@gmail.com
+   Password: senku.12345
+4. Ensure "Auto-confirm user" is CHECKED or confirm it manually.
+*/
