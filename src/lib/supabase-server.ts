@@ -7,11 +7,11 @@ export async function createClient() {
 
     if (!supabaseUrl || !supabaseAnonKey) {
         if (process.env.NODE_ENV === 'production') {
-            console.error('ERROR: Supabase Environment Variables are missing in Production!')
+            console.error('CRITICAL ERROR: Supabase Environment Variables are missing in Production! Please check Vercel Environment Variables.')
+        } else {
+            console.warn('Supabase Environment Variables are missing. Database features will be unavailable.')
         }
-        // Instead of throwing immediately, we'll try to continue or let the caller handle it.
-        // But createServerClient requires them.
-        return null as any;
+        return null;
     }
 
     const cookieStore = await cookies()

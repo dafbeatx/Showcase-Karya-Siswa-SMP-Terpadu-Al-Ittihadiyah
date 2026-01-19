@@ -12,7 +12,11 @@ export default function Error({
 }) {
     useEffect(() => {
         // Log the error to an error reporting service
-        console.error('SERVER_RENDER_ERROR:', error)
+        console.error('SERVER_RENDER_ERROR:', {
+            message: error.message,
+            stack: error.stack,
+            digest: error.digest,
+        })
     }, [error])
 
     return (

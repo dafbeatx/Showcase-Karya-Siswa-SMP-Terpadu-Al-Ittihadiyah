@@ -6,9 +6,9 @@ export function createClient() {
 
     if (!supabaseUrl || !supabaseAnonKey) {
         if (typeof window !== 'undefined') {
-            console.error('Supabase key or URL is missing in Browser!');
+            console.error('Supabase configuration is missing. Please check your environment variables.');
         }
-        return null as any;
+        return null;
     }
 
     return createBrowserClient(
