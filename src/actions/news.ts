@@ -137,7 +137,7 @@ export async function uploadNewsImage(file: File) {
         const supabase = await createClient();
         if (!supabase) throw new Error('Konfigurasi Supabase tidak ditemukan.');
 
-        const fileExt = file.name.split('.').pop() || 'jpg';
+        const fileExt = 'webp'; // Enforced WebP for optimization
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
         const filePath = `news/${fileName}`;
 

@@ -1,4 +1,4 @@
-// --- HELPER: KOMPRES GAMBAR OTOMATIS (Returns Blob for Upload) ---
+// --- HELPER: OPTIMIZE & COMPRESS IMAGE (WebP, Resize, Compression) ---
 export const compressImage = async (file: File): Promise<Blob> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -11,7 +11,7 @@ export const compressImage = async (file: File): Promise<Blob> => {
                 const canvas = document.createElement('canvas');
                 let width = img.width;
                 let height = img.height;
-                const MAX_WIDTH = 1200; // Increased for better news quality
+                const MAX_WIDTH = 1280; // Optimized for news portal
 
                 if (width > MAX_WIDTH) {
                     height *= MAX_WIDTH / width;
@@ -29,8 +29,8 @@ export const compressImage = async (file: File): Promise<Blob> => {
                             if (blob) resolve(blob);
                             else reject(new Error('Canvas toBlob failed'));
                         },
-                        'image/jpeg',
-                        0.7 // Quality
+                        'image/webp', // Convert to WebP
+                        0.8 // High quality for WebP
                     );
                 } else {
                     reject(new Error('Canvas context failed'));

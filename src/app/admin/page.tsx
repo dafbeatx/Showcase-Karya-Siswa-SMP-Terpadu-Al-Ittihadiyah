@@ -15,7 +15,7 @@ export default function AdminPage() {
     const [isUploadingImg, setIsUploadingImg] = useState(false);
 
     // Status Notification State
-    const [status, setStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({
+    const [status, setStatus] = useState<{ type: 'success' | 'error' | 'info' | null; message: string }>({
         type: null,
         message: ''
     });
@@ -36,22 +36,31 @@ export default function AdminPage() {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        setIsUploadingImg(true);
-        try {
-            // 1. Client-side compression
-            let finalFile: File = file;
-            if (file.size > 1 * 1024 * 1024) { // If > 1MB, compress
-                const compressedBlob = await compressImage(file);
-                finalFile = new File([compressedBlob], file.name, { type: 'image/jpeg' });
-            }
+        // 1. Validation
+        if (!file.type.startsWith('image/')) {
+            return showStatus('error', 'File harus berupa gambar (JPG, PNG, dll).');
+        }
+        if (file.size > 10 * 1024 * 1024) { // 10MB limit
+            return showStatus('error', 'Ukuran gambar terlalu besar (Maks 10MB sebelum kompres).');
+        }
 
-            // 2. Upload to Supabase (via Server Action)
+        setIsUploadingImg(true);
+        setStatus({ type: 'info', message: 'Mengompres gambar...' });
+
+        try {
+            // 2. Client-side optimization (Convert to WebP & Resize)
+            const compressedBlob = await compressImage(file);
+            const finalFile = new File([compressedBlob], 'upload.webp', { type: 'image/webp' });
+
+            setStatus({ type: 'info', message: 'Mengunggah gambar...' });
+
+            // 3. Upload to Supabase
             const url = await uploadNewsImage(finalFile);
             setFormData(prev => ({ ...prev, image_url: url }));
-            showStatus('success', 'Gambar berhasil diunggah.');
+            showStatus('success', 'Gambar berhasil dioptimalkan & diunggah.');
         } catch (error: any) {
             console.error(error);
-            showStatus('error', 'Gagal upload gambar: ' + (error.message || 'Terjadi kesalahan sistem.'));
+            showStatus('error', 'Gagal memproses gambar: ' + (error.message || 'Terjadi kesalahan.'));
         } finally {
             setIsUploadingImg(false);
         }
@@ -88,9 +97,13 @@ export default function AdminPage() {
 
             {/* Status Notification */}
             {status.type && (
-                <div className={`fixed top-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl border backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300 ${status.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-red-500/10 border-red-500/20 text-red-500'
+                <div className={`fixed top-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl border backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300 ${status.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' :
+                    status.type === 'info' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                        'bg-red-500/10 border-red-500/20 text-red-500'
                     }`}>
-                    {status.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+                    {status.type === 'success' ? <CheckCircle2 size={20} /> :
+                        status.type === 'info' ? <Loader2 className="animate-spin" size={20} /> :
+                            <AlertCircle size={20} />}
                     <span className="text-sm font-bold">{status.message}</span>
                     <button onClick={() => setStatus({ type: null, message: '' })} className="ml-4 hover:opacity-70"><X size={16} /></button>
                 </div>
