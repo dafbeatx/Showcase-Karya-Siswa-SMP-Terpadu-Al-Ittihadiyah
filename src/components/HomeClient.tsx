@@ -145,7 +145,7 @@ export default function HomeClient({ initialNews }: HomeClientProps) {
                             <div className="h-16 w-16 bg-gray-500/5 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <Search size={32} className="text-gray-500/20" />
                             </div>
-                            <p className="text-gray-500 text-lg font-medium">Belum ada berita yang ditemukan.</p>
+                            <p className="text-gray-500 text-lg font-medium">Belum ada berita yang dipublikasikan.</p>
                             <button onClick={() => { setSearchTerm(''); setActiveCategory('All'); }} className="mt-4 text-[var(--accent)] text-sm font-bold hover:underline">Reset Filter</button>
                         </div>
                     )}

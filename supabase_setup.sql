@@ -36,11 +36,21 @@ BEGIN
     END IF;
 END $$;
 
+-- MIGRATION: Ensure all existing news has a status and category (Case consistency)
+UPDATE public.news_posts SET status = 'published' WHERE status IS NULL;
+UPDATE public.news_posts SET category = 'Kegiatan' WHERE category IS NULL;
+-- Optional: Force title-case for existing categories if any were lowercase
+UPDATE public.news_posts SET category = 'Kegiatan' WHERE LOWER(category) = 'kegiatan';
+UPDATE public.news_posts SET category = 'Prestasi' WHERE LOWER(category) = 'prestasi';
+UPDATE public.news_posts SET category = 'Pengumuman' WHERE LOWER(category) = 'pengumuman';
+UPDATE public.news_posts SET category = 'PPDB' WHERE LOWER(category) = 'ppdb';
+
 -- 2. Enable Row Level Security (RLS)
 ALTER TABLE public.news_posts ENABLE ROW LEVEL SECURITY;
 
 -- 3. DROP existing policies to avoid conflicts
 DROP POLICY IF EXISTS "Public can view news" ON public.news_posts;
+DROP POLICY IF EXISTS "Public can view published news" ON public.news_posts;
 DROP POLICY IF EXISTS "Anyone can insert news" ON public.news_posts;
 DROP POLICY IF EXISTS "Admins can update news" ON public.news_posts;
 DROP POLICY IF EXISTS "Admins can delete news" ON public.news_posts;
@@ -74,7 +84,11 @@ USING (auth.role() = 'authenticated');
 
 -- 5. STORAGE BUCKET SETUP
 -- Ensure you have a bucket named 'school-news'
--- Run these in your SQL editor if you want to set policies via SQL
+
+-- DROP existing storage policies to avoid conflicts
+DROP POLICY IF EXISTS "Public Read Access" ON storage.objects;
+DROP POLICY IF EXISTS "Anyone can upload images" ON storage.objects;
+DROP POLICY IF EXISTS "Admins can manage images" ON storage.objects;
 
 -- Allow public to read images
 CREATE POLICY "Public Read Access" 
