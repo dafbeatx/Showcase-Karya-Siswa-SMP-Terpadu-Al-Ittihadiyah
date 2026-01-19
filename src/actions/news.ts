@@ -47,19 +47,14 @@ export async function getNewsPostById(id: string) {
     }
 }
 
-export async function uploadNewsPost(formData: { title: string; content: string; image_url: string; image_source?: string }) {
-    console.log('Starting uploadNewsPost with data:', { ...formData, content: formData.content?.substring(0, 20) + '...' });
-
-    // Validation
+export async function uploadNewsPost(formData: { title: string; content: string; image_url: string; image_source?: string; is_featured?: boolean }) {
     if (!formData.title || !formData.content || !formData.image_url) {
         return { success: false, error: 'Judul, konten, dan gambar wajib diisi.' };
     }
 
     try {
         const supabase = await createClient();
-        if (!supabase) {
-            return { success: false, error: 'Gagal terhubung ke database. Periksa konfigurasi server.' };
-        }
+        if (!supabase) return { success: false, error: 'Gagal terhubung ke database.' };
 
         const { data, error } = await supabase
             .from('news_posts')
@@ -69,21 +64,48 @@ export async function uploadNewsPost(formData: { title: string; content: string;
                     content: formData.content.trim(),
                     image_url: formData.image_url,
                     image_source: formData.image_source?.trim() || '',
+                    is_featured: formData.is_featured || false,
                 },
             ])
             .select();
 
-        if (error) {
-            console.error('Database Insert Error:', error);
-            return { success: false, error: 'Database Error: ' + error.message };
-        }
+        if (error) return { success: false, error: error.message };
 
-        console.log('News post uploaded successfully');
         revalidatePath('/');
         return { success: true, data };
     } catch (e: any) {
-        console.error('uploadNewsPost unexpected error:', e);
-        return { success: false, error: 'Server Error: ' + (e.message || 'Terjadi kesalahan sistem internal.') };
+        return { success: false, error: e.message };
+    }
+}
+
+export async function updateNewsPost(id: string, formData: { title: string; content: string; image_url: string; image_source?: string; is_featured?: boolean }) {
+    if (!id || !formData.title || !formData.content) {
+        return { success: false, error: 'Data tidak lengkap.' };
+    }
+
+    try {
+        const supabase = await createClient();
+        if (!supabase) return { success: false, error: 'Gagal terhubung ke database.' };
+
+        const { data, error } = await supabase
+            .from('news_posts')
+            .update({
+                title: formData.title.trim(),
+                content: formData.content.trim(),
+                image_url: formData.image_url,
+                image_source: formData.image_source?.trim() || '',
+                is_featured: formData.is_featured || false,
+            })
+            .eq('id', id)
+            .select();
+
+        if (error) return { success: false, error: error.message };
+
+        revalidatePath('/');
+        revalidatePath(`/news/${id}`);
+        return { success: true, data };
+    } catch (e: any) {
+        return { success: false, error: e.message };
     }
 }
 
@@ -99,25 +121,17 @@ export async function deleteNewsPost(id: string) {
             .delete()
             .eq('id', id);
 
-        if (error) {
-            console.error('Delete error:', error);
-            return { success: false, error: error.message };
-        }
+        if (error) return { success: false, error: error.message };
 
         revalidatePath('/');
         return { success: true };
     } catch (e: any) {
-        console.error('deleteNewsPost unexpected error:', e);
         return { success: false, error: e.message };
     }
 }
 
 export async function uploadNewsImage(file: File) {
-    console.log('Starting uploadNewsImage, file:', file.name, 'size:', file.size);
-
-    if (!file) {
-        throw new Error('File tidak ditemukan.');
-    }
+    if (!file) throw new Error('File tidak ditemukan.');
 
     try {
         const supabase = await createClient();
@@ -127,28 +141,18 @@ export async function uploadNewsImage(file: File) {
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
         const filePath = `news/${fileName}`;
 
-        console.log('Uploading to bucket: school-news, path:', filePath);
-
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
             .from('school-news')
-            .upload(filePath, file, {
-                cacheControl: '3600',
-                upsert: false
-            });
+            .upload(filePath, file);
 
-        if (error) {
-            console.error('Storage Upload Error:', error);
-            throw new Error('Gagal unggah gambar: ' + error.message);
-        }
+        if (error) throw new Error('Gagal unggah gambar: ' + error.message);
 
         const { data: { publicUrl } } = supabase.storage
             .from('school-news')
             .getPublicUrl(filePath);
 
-        console.log('Image uploaded successfully, public URL:', publicUrl);
         return publicUrl;
     } catch (e: any) {
-        console.error('uploadNewsImage unexpected error:', e);
-        throw e; // We still throw here because the client catches it specifically in handleImageUpload
+        throw e;
     }
 }

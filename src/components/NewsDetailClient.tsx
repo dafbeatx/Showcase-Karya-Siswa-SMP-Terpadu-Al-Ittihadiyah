@@ -26,9 +26,9 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
 
     if (!post) {
         return (
-            <div className="min-h-screen bg-[#09090b] text-white flex flex-col items-center justify-center gap-6">
-                <h2 className="text-2xl font-bold">Berita tidak ditemukan</h2>
-                <button onClick={() => router.push('/')} className="px-6 py-2 bg-white text-black rounded-full font-bold">Kembali</button>
+            <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col items-center justify-center gap-6">
+                <h2 className="text-2xl font-bold italic">Berita tidak ditemukan</h2>
+                <button onClick={() => router.push('/')} className="px-8 py-3 bg-[var(--accent)] text-white rounded-full font-bold shadow-lg shadow-purple-500/20 active:scale-95 transition-all">Kembali</button>
             </div>
         );
     }
@@ -64,7 +64,7 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
     };
 
     return (
-        <div className="min-h-screen bg-[#09090b] text-white selection:bg-purple-500/30">
+        <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] selection:bg-purple-500/30">
             <Navbar
                 isScrolled={isScrolled}
                 mobileMenuOpen={false}
@@ -76,25 +76,28 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
                 <div className="max-w-7xl mx-auto px-4 md:px-6">
                     <button
                         onClick={() => router.back()}
-                        className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8 group"
+                        className="flex items-center gap-2 text-gray-500 hover:text-[var(--foreground)] transition-colors mb-8 group font-bold text-sm uppercase tracking-widest"
                     >
-                        <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> Kembali
+                        <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> Kembali
                     </button>
 
                     <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-12 items-start">
                         {/* LEFT: CONTENT */}
                         <article className="space-y-12">
                             <header>
-                                <div className="flex items-center gap-2 text-purple-400 text-sm font-medium mb-4">
+                                <div className="flex items-center gap-2 text-[var(--accent)] text-xs font-bold uppercase tracking-widest mb-4">
                                     <Calendar size={16} />
                                     {formattedDate}
+                                    {post.is_featured && (
+                                        <span className="ml-4 px-2 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded text-[10px]">FEATURED</span>
+                                    )}
                                 </div>
-                                <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-8 leading-[1.2]">
+                                <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-8 leading-[1.1] md:leading-[1.2]">
                                     {post.title}
                                 </h1>
                             </header>
 
-                            <div className="relative w-full aspect-[16/9] rounded-3xl overflow-hidden shadow-2xl shadow-purple-900/10 border border-white/5">
+                            <div className="relative w-full aspect-[16/9] rounded-[40px] overflow-hidden shadow-2xl border border-[var(--border)] shadow-purple-500/5">
                                 <Image
                                     src={post.image_url || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=2070&auto=format&fit=crop'}
                                     alt={post.title}
@@ -103,7 +106,7 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
                                     priority
                                 />
                                 {post.image_source && (
-                                    <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] text-gray-300 border border-white/10">
+                                    <div className="absolute bottom-6 right-6 bg-[var(--background)]/80 backdrop-blur-xl px-4 py-2 rounded-2xl text-[10px] font-bold text-gray-400 border border-[var(--border)] shadow-lg uppercase tracking-widest">
                                         Sumber: {post.image_source}
                                     </div>
                                 )}
@@ -111,19 +114,19 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
 
                             <div className="prose prose-invert max-w-none">
                                 {post.content.split('\n').map((para: string, i: number) => (
-                                    para.trim() && <p key={i} className="text-gray-300 text-lg md:text-xl leading-relaxed mb-6">{para}</p>
+                                    para.trim() && <p key={i} className="text-gray-500 text-lg md:text-xl leading-relaxed mb-6 font-medium">{para}</p>
                                 ))}
                             </div>
 
-                            {/* MOBILE ONLY SHARE (Simplified for flow) */}
-                            <div className="pt-12 border-t border-white/5 lg:hidden">
-                                <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-6">Bagikan Berita</h4>
+                            {/* MOBILE ONLY SHARE */}
+                            <div className="pt-12 border-t border-[var(--border)] lg:hidden">
+                                <h4 className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-6">Bagikan Berita</h4>
                                 <div className="flex gap-4">
-                                    <button onClick={() => handleShare('facebook')} className="h-12 w-12 rounded-2xl bg-[#1877f2]/10 border border-[#1877f2]/20 flex items-center justify-center text-[#1877f2] hover:bg-[#1877f2] hover:text-white transition-all"><Facebook size={20} /></button>
-                                    <button onClick={() => handleShare('twitter')} className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-all"><Twitter size={20} /></button>
-                                    <button onClick={() => handleShare('copy')} className="flex-grow h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center gap-2 text-gray-300 hover:bg-white/10 transition-all font-bold text-sm">
-                                        {copied ? <Check size={18} className="text-green-500" /> : <LinkIcon size={18} />}
-                                        {copied ? 'Tersalin' : 'Salin Link'}
+                                    <button onClick={() => handleShare('facebook')} className="h-14 w-14 rounded-2xl bg-[#1877f2]/10 border border-[#1877f2]/20 flex items-center justify-center text-[#1877f2] hover:bg-[#1877f2] hover:text-white transition-all"><Facebook size={24} /></button>
+                                    <button onClick={() => handleShare('twitter')} className="h-14 w-14 rounded-2xl bg-[var(--card-bg)] border border-[var(--border)] flex items-center justify-center text-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all"><Twitter size={24} /></button>
+                                    <button onClick={() => handleShare('copy')} className="flex-grow h-14 rounded-2xl bg-[var(--card-bg)] border border-[var(--border)] flex items-center justify-center gap-2 text-gray-500 hover:text-[var(--foreground)] hover:bg-[var(--background)] transition-all font-bold text-sm uppercase tracking-widest">
+                                        {copied ? <Check size={20} className="text-green-500" /> : <LinkIcon size={20} />}
+                                        {copied ? 'Tersalin' : 'Copy link'}
                                     </button>
                                 </div>
                             </div>
@@ -132,8 +135,10 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
                         {/* RIGHT: SIDEBAR */}
                         <aside className="space-y-12">
                             {/* SHARE BOX (Desktop) */}
-                            <div className="hidden lg:block p-8 rounded-3xl bg-white/5 border border-white/10 sticky top-32">
-                                <h4 className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-6">Bagikan</h4>
+                            <div className="hidden lg:block p-8 rounded-[32px] bg-[var(--card-bg)] border border-[var(--border)] sticky top-32 shadow-sm">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6 flex items-center gap-2">
+                                    <Share2 size={12} className="text-[var(--accent)]" /> Bagikan
+                                </h4>
                                 <div className="space-y-4">
                                     <button
                                         onClick={() => handleShare('facebook')}
@@ -144,25 +149,25 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
                                     </button>
                                     <button
                                         onClick={() => handleShare('twitter')}
-                                        className="w-full flex items-center gap-4 p-3 rounded-2xl bg-white/5 border border-white/10 text-white hover:bg-white hover:text-black transition-all group"
+                                        className="w-full flex items-center gap-4 p-3 rounded-2xl bg-[var(--background)] border border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-all group shadow-sm"
                                     >
                                         <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/20"><Twitter size={20} /></div>
                                         <span className="text-sm font-bold">Twitter / X</span>
                                     </button>
                                     <button
                                         onClick={() => handleShare('copy')}
-                                        className={`w-full flex items-center gap-4 p-3 rounded-2xl border transition-all group ${copied ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-white/5 border-white/10 text-white hover:bg-purple-500/10 hover:border-purple-500/30'}`}
+                                        className={`w-full flex items-center gap-4 p-3 rounded-2xl border transition-all group shadow-sm ${copied ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-[var(--background)] border-[var(--border)] text-[var(--foreground)] hover:border-[var(--accent)]/30'}`}
                                     >
                                         <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/20">
                                             {copied ? <Check size={20} /> : <LinkIcon size={20} />}
                                         </div>
-                                        <span className="text-sm font-bold">{copied ? 'Tersalin!' : 'Copy Link'}</span>
+                                        <span className="text-sm font-bold">{copied ? 'Tersalin!' : 'Salin Link'}</span>
                                     </button>
 
                                     {typeof navigator !== 'undefined' && !!navigator.share && (
                                         <button
                                             onClick={() => handleShare('web')}
-                                            className="w-full flex items-center gap-4 p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 hover:bg-purple-500 hover:text-white transition-all group"
+                                            className="w-full flex items-center gap-4 p-3 rounded-2xl bg-[var(--accent)]/10 border border-[var(--accent)]/20 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white transition-all group"
                                         >
                                             <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-white/20"><Share2 size={20} /></div>
                                             <span className="text-sm font-bold">Lainnya</span>
@@ -173,9 +178,9 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
 
                             {/* OTHER NEWS */}
                             <div className="space-y-6">
-                                <h4 className="text-xs font-bold uppercase tracking-widest text-gray-500 flex items-center justify-between">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center justify-between">
                                     <span>Berita Lainnya</span>
-                                    <div className="h-px flex-grow bg-white/5 ml-4"></div>
+                                    <div className="h-px flex-grow bg-[var(--border)] ml-4"></div>
                                 </h4>
                                 <div className="space-y-6">
                                     {otherNews.length > 0 ? (
@@ -185,7 +190,7 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
                                                 href={`/news/${news.id}`}
                                                 className="flex gap-4 group cursor-pointer"
                                             >
-                                                <div className="relative h-20 w-24 rounded-2xl overflow-hidden flex-shrink-0 border border-white/5 group-hover:border-purple-500/30 transition-all">
+                                                <div className="relative h-20 w-24 rounded-2xl overflow-hidden flex-shrink-0 border border-[var(--border)] group-hover:border-[var(--accent)]/30 transition-all shadow-sm">
                                                     <Image
                                                         src={news.image_url || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=2070&auto=format&fit=crop'}
                                                         alt={news.title}
@@ -195,24 +200,24 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
                                                     />
                                                 </div>
                                                 <div className="flex flex-col justify-center min-w-0">
-                                                    <h5 className="text-sm font-bold line-clamp-2 leading-snug group-hover:text-purple-400 transition-colors">
+                                                    <h5 className="text-sm font-bold line-clamp-2 leading-snug group-hover:text-[var(--accent)] transition-colors">
                                                         {news.title}
                                                     </h5>
-                                                    <span className="text-[10px] text-gray-500 mt-1 uppercase tracking-wider font-medium">
+                                                    <span className="text-[10px] text-gray-500 mt-1 uppercase tracking-widest font-bold">
                                                         {new Date(news.created_at).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' })}
                                                     </span>
                                                 </div>
                                             </Link>
                                         ))
                                     ) : (
-                                        <p className="text-xs text-gray-600 text-center py-4 italic">Belum ada berita lainnya.</p>
+                                        <p className="text-xs text-gray-500 text-center py-4 italic">Belum ada berita lainnya.</p>
                                     )}
                                 </div>
                                 <Link
                                     href="/"
-                                    className="block text-center py-4 rounded-2xl bg-white/5 border border-white/10 text-xs font-bold text-gray-400 hover:text-white hover:bg-white/10 transition-all uppercase tracking-widest"
+                                    className="block text-center py-4 rounded-3xl bg-[var(--card-bg)] border border-[var(--border)] text-xs font-black text-gray-500 hover:text-[var(--foreground)] hover:border-[var(--accent)]/30 transition-all uppercase tracking-[0.2em] shadow-sm active:scale-95"
                                 >
-                                    Lihat Semua Berita
+                                    Lihat Semua
                                 </Link>
                             </div>
                         </aside>

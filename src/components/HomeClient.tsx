@@ -40,7 +40,7 @@ export default function HomeClient({ initialNews }: HomeClientProps) {
     }, [news, searchTerm]);
 
     return (
-        <div className="min-h-screen bg-[#09090b] text-white selection:bg-purple-500/30 selection:text-purple-200">
+        <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] selection:bg-purple-500/30">
             <Navbar
                 isScrolled={isScrolled}
                 mobileMenuOpen={mobileMenuOpen}
@@ -61,8 +61,8 @@ export default function HomeClient({ initialNews }: HomeClientProps) {
 
                 <section id="berita-terbaru" className="max-w-7xl mx-auto px-4 md:px-6 pb-24 scroll-mt-24">
                     <div className="flex items-center justify-between mb-12">
-                        <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Berita Terbaru</h2>
-                        <div className="h-px flex-grow bg-white/5 mx-8 hidden md:block"></div>
+                        <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight italic">Berita <span className="text-[var(--accent)]">Terbaru</span></h2>
+                        <div className="h-px flex-grow bg-[var(--border)] mx-8 hidden md:block"></div>
                     </div>
 
                     {filteredNews.length > 0 ? (
@@ -72,8 +72,8 @@ export default function HomeClient({ initialNews }: HomeClientProps) {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-32 bg-white/5 rounded-3xl border border-white/5 border-dashed">
-                            <p className="text-gray-500 text-lg">Belum ada berita yang ditemukan.</p>
+                        <div className="text-center py-32 bg-[var(--card-bg)] rounded-[32px] border border-[var(--border)] border-dashed shadow-sm">
+                            <p className="text-gray-500 text-lg font-medium">Belum ada berita yang ditemukan.</p>
                         </div>
                     )}
                 </section>
