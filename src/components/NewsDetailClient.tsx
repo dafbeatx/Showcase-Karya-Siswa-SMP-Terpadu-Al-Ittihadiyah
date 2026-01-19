@@ -97,16 +97,19 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
                                 </h1>
                             </header>
 
-                            <div className="relative w-full aspect-[16/9] rounded-[40px] overflow-hidden shadow-2xl border border-[var(--border)] shadow-purple-500/5">
-                                <Image
-                                    src={post.image_url || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=2070&auto=format&fit=crop'}
-                                    alt={post.title}
-                                    fill
-                                    className="object-cover"
-                                    priority
-                                />
+                            <div className="space-y-4">
+                                <div className="relative w-full aspect-[16/9] rounded-[32px] md:rounded-[40px] overflow-hidden shadow-2xl border border-[var(--border)] shadow-purple-500/5">
+                                    <Image
+                                        src={post.image_url || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=2070&auto=format&fit=crop'}
+                                        alt={post.title}
+                                        fill
+                                        className="object-cover"
+                                        priority
+                                    />
+                                </div>
                                 {post.image_source && (
-                                    <div className="absolute bottom-6 right-6 bg-[var(--background)]/80 backdrop-blur-xl px-4 py-2 rounded-2xl text-[10px] font-bold text-gray-400 border border-[var(--border)] shadow-lg uppercase tracking-widest">
+                                    <div className="text-[10px] md:text-xs font-medium text-gray-400 dark:text-gray-500 italic px-2 flex items-center gap-2">
+                                        <div className="w-6 h-px bg-gray-200 dark:bg-gray-800" />
                                         Sumber: {post.image_source}
                                     </div>
                                 )}
