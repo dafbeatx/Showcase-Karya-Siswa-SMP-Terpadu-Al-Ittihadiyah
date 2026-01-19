@@ -1,5 +1,5 @@
 import React from 'react';
-import { getNewsPostById } from '@/actions/news';
+import { getNewsPostById, getNewsPosts } from '@/actions/news';
 import NewsDetailClient from '@/components/NewsDetailClient';
 import { notFound } from 'next/navigation';
 
@@ -13,9 +13,20 @@ interface PageProps {
 export default async function NewsDetailPage({ params }: PageProps) {
     const { id } = await params;
     let post = null;
+    let otherNews: any[] = [];
 
     try {
+        // Fetch main post
         post = await getNewsPostById(id);
+
+        if (post) {
+            // Fetch all news for the sidebar
+            const allNews = await getNewsPosts();
+            // Filter out current news and take first 5
+            otherNews = allNews
+                .filter((item: any) => item.id !== id)
+                .slice(0, 5);
+        }
     } catch (error) {
         console.error('Error fetching news detail on server:', error);
     }
@@ -25,6 +36,6 @@ export default async function NewsDetailPage({ params }: PageProps) {
     }
 
     return (
-        <NewsDetailClient post={post} />
+        <NewsDetailClient post={post} otherNews={otherNews} />
     );
 }

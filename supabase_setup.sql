@@ -1,42 +1,56 @@
--- 1. Create the student_projects table
-CREATE TABLE IF NOT EXISTS student_projects (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+-- ==========================================
+-- SUPABASE DATABASE SETUP (SQL Editor)
+-- ==========================================
+
+-- 1. Create news_posts table
+CREATE TABLE IF NOT EXISTS public.news_posts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT NOT NULL,
-    student_name TEXT NOT NULL,
-    class TEXT,
-    category TEXT, -- Added category
-    description TEXT,
-    image_url TEXT,
-    drive_link TEXT,
-    tags TEXT[],
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+    content TEXT NOT NULL,
+    image_url TEXT NOT NULL,
+    image_source TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 2. Enable Row Level Security (RLS)
-ALTER TABLE student_projects ENABLE ROW LEVEL SECURITY;
+-- 2. Enable Row Level Security
+ALTER TABLE public.news_posts ENABLE ROW LEVEL SECURITY;
 
--- 3. Create Policies
--- Policy: Allow anyone to read the data
-CREATE POLICY "Allow public read access" 
-ON student_projects 
-FOR SELECT 
+-- 3. Policy: Public can view news (SELECT)
+CREATE POLICY "Public can view news" 
+ON public.news_posts FOR SELECT 
 USING (true);
 
--- Policy: Allow inserts (currently public for simplicity in this task, but can be restricted)
-CREATE POLICY "Allow public insert" 
-ON student_projects 
-FOR INSERT 
+-- 4. Policy: Anyone can insert news (INSERT) - (Adjust as needed later)
+CREATE POLICY "Anyone can insert news" 
+ON public.news_posts FOR INSERT 
 WITH CHECK (true);
 
--- Policy: Allow deletion (currently public for simplicity, restricted by password in app)
-CREATE POLICY "Allow public delete" 
-ON student_projects 
-FOR DELETE 
-USING (true);
+-- 5. Policy: Anyone can delete news (DELETE) - (OPTIONAL: Keep disabled for security if no Auth)
+-- CREATE POLICY "Anyone can delete news" 
+-- ON public.news_posts FOR DELETE 
+-- USING (true);
 
--- 4. Storage Bucket Setup (Create manually or via API)
--- Bucket name: showcase-projects
--- Make sure the bucket is public or has appropriate policies.
--- storage.objects policies:
--- CREATE POLICY "Public Access" ON storage.objects FOR SELECT USING (bucket_id = 'showcase-projects');
--- CREATE POLICY "Public Upload" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'showcase-projects');
+
+-- ==========================================
+-- SUPABASE STORAGE SETUP (SQL Editor)
+-- ==========================================
+
+-- 1. Create 'school-news' bucket
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('school-news', 'school-news', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- 2. Storage Policy: Allow public to view files
+CREATE POLICY "Public Read Access" 
+ON storage.objects FOR SELECT 
+USING ( bucket_id = 'school-news' );
+
+-- 3. Storage Policy: Allow anyone to upload files (Adjust for Auth later)
+CREATE POLICY "Public Upload Access" 
+ON storage.objects FOR INSERT 
+WITH CHECK ( bucket_id = 'school-news' );
+
+-- 4. Storage Policy: Allow anyone to update/delete (Optional)
+CREATE POLICY "Public Update/Delete Access"
+ON storage.objects FOR ALL
+USING ( bucket_id = 'school-news' );
