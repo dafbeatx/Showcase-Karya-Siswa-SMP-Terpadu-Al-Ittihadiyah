@@ -19,7 +19,7 @@ export default function Footer() {
                     <div className="space-y-4">
                         <h3 className="font-bold uppercase text-xs tracking-widest text-gray-400">Tautan Penting</h3>
                         <ul className="space-y-3">
-                            <li><a href="https://ppdb-smp-terpadu-al-ittihadiyah.vercel.app/" target="_blank" rel="noreferrer" className="text-sm font-bold text-gray-500 hover:text-[var(--accent)] transition-colors uppercase tracking-wider">PPDB Online 2025</a></li>
+                            <li><a href="https://ppdb-smp-terpadu-al-ittihadiyah.vercel.app/" target="_blank" rel="noreferrer" className="text-sm font-bold text-gray-500 hover:text-[var(--accent)] transition-colors uppercase tracking-wider">PPDB Online 2026/2027</a></li>
                             <li><a href="/" className="text-sm font-bold text-gray-500 hover:text-[var(--foreground)] transition-colors uppercase tracking-wider">Beranda</a></li>
                             <li><a href="/admin" className="text-sm font-bold text-gray-500 hover:text-[var(--foreground)] transition-colors uppercase tracking-wider">Kirim Berita</a></li>
                         </ul>

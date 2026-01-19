@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { ArrowRight, Sparkles, GraduationCap } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
+import Image from 'next/image';
 
 export default function PPDBBanner() {
     return (
@@ -14,7 +15,7 @@ export default function PPDBBanner() {
 
                     <div className="relative flex-grow space-y-4 md:space-y-6 text-center lg:text-left">
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-500 text-[10px] md:text-xs font-black uppercase tracking-[0.2em]">
-                            <Sparkles size={14} /> PPDB TP. 2025/2026
+                            <Sparkles size={14} /> PPDB TP. 2026/2027
                         </div>
 
                         <h2 className="text-2xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.2] md:leading-[1.1]">
@@ -46,19 +47,24 @@ export default function PPDBBanner() {
                         </div>
                     </div>
 
-                    <div className="relative w-full lg:w-80 h-40 md:h-48 lg:h-80 flex-shrink-0 animate-float">
-                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/30 to-purple-500/30 rounded-[32px] md:rounded-[40px] rotate-6 scale-90 blur-xl" />
-                        <div className="relative w-full h-full bg-[var(--card-bg)] border border-[var(--border)] rounded-[32px] md:rounded-[40px] flex items-center justify-center shadow-2xl p-6 md:p-8 overflow-hidden group">
-                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 group-hover:opacity-100 opacity-0 transition-opacity duration-700" />
-                            <GraduationCap className="text-[var(--accent)] w-20 h-20 md:w-32 md:h-32 drop-shadow-2xl" strokeWidth={1.5} />
+                    <div className="relative w-full lg:w-[400px] h-48 md:h-64 lg:h-80 flex-shrink-0 animate-float">
+                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/30 to-purple-500/30 rounded-[32px] md:rounded-[40px] rotate-6 scale-95 blur-xl" />
+                        <div className="relative w-full h-full bg-[var(--card-bg)] border border-[var(--border)] rounded-[32px] md:rounded-[40px] overflow-hidden shadow-2xl group">
+                            <Image
+                                src="/ppdb-banner.jpg"
+                                alt="PPDB SMP Terpadu Al-Ittihadiyah"
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-700"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
                             <div className="absolute bottom-4 md:bottom-6 left-6 right-6">
-                                <div className="h-1 w-full bg-[var(--border)] rounded-full overflow-hidden">
-                                    <div className="h-full w-2/3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full animate-pulse" />
+                                <div className="h-1 w-full bg-white/20 rounded-full overflow-hidden">
+                                    <div className="h-full w-2/3 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full animate-pulse" />
                                 </div>
-                                <div className="flex justify-between mt-1 md:mt-2 font-black text-[7px] md:text-[8px] text-gray-500 uppercase tracking-widest">
-                                    <span>Quota 2025</span>
-                                    <span>65% Filled</span>
+                                <div className="flex justify-between mt-1 md:mt-2 font-black text-[7px] md:text-[8px] text-white uppercase tracking-widest">
+                                    <span>Quota 2026</span>
+                                    <span>65% Terisi</span>
                                 </div>
                             </div>
                         </div>

@@ -87,7 +87,7 @@ export default function Navbar({ isScrolled, mobileMenuOpen, setMobileMenuOpen, 
                             rel="noopener noreferrer"
                             className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-black rounded-full hover:opacity-90 transition-all flex items-center gap-2 shadow-xl shadow-indigo-500/20 uppercase tracking-widest"
                         >
-                            PPDB 2025
+                            PPDB 2026/2027
                         </a>
 
                         <Link href="/admin" className="px-6 py-2.5 bg-[var(--accent)] text-white text-sm font-black rounded-full hover:opacity-90 transition-all flex items-center gap-2 shadow-xl shadow-purple-500/20 uppercase tracking-widest">
@@ -141,7 +141,7 @@ export default function Navbar({ isScrolled, mobileMenuOpen, setMobileMenuOpen, 
                         onClick={() => setMobileMenuOpen?.(false)}
                         className="text-3xl font-black text-indigo-500 uppercase tracking-tighter"
                     >
-                        PPDB 2025
+                        PPDB 2026/2027
                     </a>
 
                     {user && (
