@@ -24,7 +24,10 @@ export default function AdminPage() {
         title: '',
         content: '',
         image_url: '',
-        image_source: ''
+        image_source: '',
+        category: 'Kegiatan',
+        author_name: '',
+        author_role: ''
     });
 
     const showStatus = (type: 'success' | 'error', message: string) => {
@@ -75,7 +78,15 @@ export default function AdminPage() {
             const result = await uploadNewsPost(formData);
             if (result.success) {
                 showStatus('success', 'Berita berhasil diterbitkan!');
-                setFormData({ title: '', content: '', image_url: '', image_source: '' });
+                setFormData({
+                    title: '',
+                    content: '',
+                    image_url: '',
+                    image_source: '',
+                    category: 'Kegiatan',
+                    author_name: '',
+                    author_role: ''
+                });
                 // Redirect back to home after success maybe?
                 setTimeout(() => {
                     window.location.href = '/';
@@ -142,6 +153,42 @@ export default function AdminPage() {
                             placeholder="Ceritakan sedetail mungkin..."
                             className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-5 py-4 md:px-6 md:py-5 text-sm md:text-base text-[var(--foreground)] focus:border-[var(--accent)] outline-none transition-all resize-none leading-relaxed shadow-sm font-medium"
                         />
+                    </div>
+
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                        <div className="space-y-1.5 md:space-y-3">
+                            <label className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Kategori</label>
+                            <select
+                                value={formData.category}
+                                onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                                className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-5 py-4 md:px-6 md:py-5 text-sm md:text-base font-bold text-[var(--foreground)] focus:border-[var(--accent)] outline-none transition-all shadow-sm appearance-none cursor-pointer"
+                            >
+                                <option value="Kegiatan">Kegiatan</option>
+                                <option value="Prestasi">Prestasi</option>
+                                <option value="Pengumuman">Pengumuman</option>
+                                <option value="PPDB">PPDB</option>
+                            </select>
+                        </div>
+
+                        <div className="space-y-1.5 md:space-y-3">
+                            <label className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Nama Penulis</label>
+                            <input
+                                value={formData.author_name}
+                                onChange={(e) => setFormData(prev => ({ ...prev, author_name: e.target.value }))}
+                                placeholder="Admin / Nama Siswa"
+                                className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-5 py-4 md:px-6 md:py-5 text-sm md:text-base font-bold text-[var(--foreground)] focus:border-[var(--accent)] outline-none transition-all shadow-sm"
+                            />
+                        </div>
+
+                        <div className="space-y-1.5 md:space-y-3">
+                            <label className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Jabatan/Peran</label>
+                            <input
+                                value={formData.author_role}
+                                onChange={(e) => setFormData(prev => ({ ...prev, author_role: e.target.value }))}
+                                placeholder="OSIS / Guru / Siswa"
+                                className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-5 py-4 md:px-6 md:py-5 text-sm md:text-base font-bold text-[var(--foreground)] focus:border-[var(--accent)] outline-none transition-all shadow-sm"
+                            />
+                        </div>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-8">

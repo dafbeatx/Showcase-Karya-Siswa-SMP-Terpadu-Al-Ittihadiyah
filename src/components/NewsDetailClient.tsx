@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Calendar, ChevronLeft, Share2, Facebook, Twitter, Link as LinkIcon, Check } from 'lucide-react';
+import { Calendar, ChevronLeft, Share2, Facebook, Twitter, Link as LinkIcon, Check, User } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -99,16 +99,38 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
                         {/* LEFT: CONTENT */}
                         <article className="space-y-12">
                             <header>
-                                <div className="flex items-center gap-2 text-[var(--accent)] text-xs font-bold uppercase tracking-widest mb-4">
-                                    <Calendar size={16} />
-                                    {formattedDate}
+                                <div className="flex flex-wrap items-center gap-4 mb-4">
+                                    <div className="flex items-center gap-2 text-[var(--accent)] text-xs font-bold uppercase tracking-widest border-r border-[var(--border)] pr-4">
+                                        <Calendar size={16} />
+                                        {formattedDate}
+                                    </div>
+                                    {post.category && (
+                                        <div className="px-3 py-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-lg text-[10px] font-black uppercase tracking-wider">
+                                            {post.category}
+                                        </div>
+                                    )}
                                     {post.is_featured && (
-                                        <span className="ml-4 px-2 py-0.5 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded text-[10px]">FEATURED</span>
+                                        <span className="px-2 py-1 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded text-[10px] font-bold">FEATURED</span>
                                     )}
                                 </div>
                                 <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-8 leading-[1.1] md:leading-[1.2]">
                                     {post.title}
                                 </h1>
+
+                                {(post.author_name || post.author_role) && (
+                                    <div className="flex items-center gap-3 p-4 bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl mb-8">
+                                        <div className="h-10 w-10 rounded-xl bg-[var(--accent)]/10 flex items-center justify-center text-[var(--accent)]">
+                                            <User size={20} />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Ditulis oleh</p>
+                                            <p className="text-sm font-bold">
+                                                {post.author_name || 'Admin'}
+                                                {post.author_role && <span className="text-gray-400 font-medium ml-1">• {post.author_role}</span>}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                             </header>
 
                             <div className="space-y-4">

@@ -8,9 +8,33 @@ CREATE TABLE IF NOT EXISTS public.news_posts (
     content TEXT NOT NULL,
     image_url TEXT NOT NULL,
     image_source TEXT,
+    category TEXT DEFAULT 'Kegiatan',
+    status TEXT DEFAULT 'pending', -- pending, published, rejected
+    author_name TEXT,
+    author_role TEXT,
     is_featured BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- MIGRATION: Add columns if they don't exist (Fix for "already exists" tables)
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'news_posts' AND COLUMN_NAME = 'category') THEN
+        ALTER TABLE public.news_posts ADD COLUMN category TEXT DEFAULT 'Kegiatan';
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'news_posts' AND COLUMN_NAME = 'status') THEN
+        ALTER TABLE public.news_posts ADD COLUMN status TEXT DEFAULT 'pending';
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'news_posts' AND COLUMN_NAME = 'author_name') THEN
+        ALTER TABLE public.news_posts ADD COLUMN author_name TEXT;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'news_posts' AND COLUMN_NAME = 'author_role') THEN
+        ALTER TABLE public.news_posts ADD COLUMN author_role TEXT;
+    END IF;
+END $$;
 
 -- 2. Enable Row Level Security (RLS)
 ALTER TABLE public.news_posts ENABLE ROW LEVEL SECURITY;
@@ -22,17 +46,23 @@ DROP POLICY IF EXISTS "Admins can update news" ON public.news_posts;
 DROP POLICY IF EXISTS "Admins can delete news" ON public.news_posts;
 
 -- 4. CREATE Policies
--- Anyone (Public) can read news
-CREATE POLICY "Public can view news" 
+-- Anyone (Public) can read news, but ONLY if status is 'published'
+-- Admins can read ALL news
+CREATE POLICY "Public can view published news" 
 ON public.news_posts FOR SELECT 
-USING (true);
+USING (
+    status = 'published' OR 
+    auth.role() = 'authenticated'
+);
 
--- Anyone (Public) can post news (as per user request "All user boleh posting")
+-- Anyone (Public) can post news, but it defaults to 'pending' via table DEFAULT
 CREATE POLICY "Anyone can insert news" 
 ON public.news_posts FOR INSERT 
-WITH CHECK (true);
+WITH CHECK (
+    status = 'pending' -- Force status to pending for public inserts
+);
 
--- ONLY Authenticated Admins can update/edit news
+-- ONLY Authenticated Admins can update/edit news (Moderation)
 CREATE POLICY "Admins can update news" 
 ON public.news_posts FOR UPDATE 
 USING (auth.role() = 'authenticated');

@@ -9,6 +9,7 @@ interface NewsPost {
     title: string;
     content: string;
     image_url: string;
+    category?: string;
     created_at: string;
 }
 
@@ -17,7 +18,7 @@ interface NewsCardProps {
 }
 
 export default function NewsCard({ post }: NewsCardProps) {
-    const { id, title, content, image_url, created_at } = post;
+    const { id, title, content, image_url, category, created_at } = post;
     const formattedDate = new Date(created_at).toLocaleDateString('id-ID', {
         day: 'numeric',
         month: 'long',
@@ -37,6 +38,12 @@ export default function NewsCard({ post }: NewsCardProps) {
                     className="object-cover transform group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--card-bg)] to-transparent opacity-60" />
+
+                {category && (
+                    <div className="absolute top-4 left-4 px-3 py-1 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg">
+                        {category}
+                    </div>
+                )}
             </div>
 
             <div className="p-5 md:p-6 flex flex-col flex-grow">

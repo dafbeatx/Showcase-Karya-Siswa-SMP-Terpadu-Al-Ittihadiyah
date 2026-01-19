@@ -7,17 +7,12 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function Home() {
-  let news: any[] = [];
-  let error = false;
-
-  try {
-    news = await getNewsPosts();
-  } catch (e) {
-    console.error('Failed to fetch news on server:', e);
-    error = true;
-  }
+  const { data: newsPosts } = await getNewsPosts({
+    limit: 9,
+    status: 'published'
+  });
 
   return (
-    <HomeClient initialNews={news} />
+    <HomeClient initialNews={newsPosts} />
   );
 }

@@ -21,9 +21,9 @@ export default async function NewsDetailPage({ params }: PageProps) {
 
         if (post) {
             // Fetch all news for the sidebar
-            const allNews = await getNewsPosts();
+            const { data: allNews } = await getNewsPosts({ status: 'published', limit: 6 });
             // Filter out current news and take first 5
-            otherNews = allNews
+            otherNews = (allNews || [])
                 .filter((item: any) => item.id !== id)
                 .slice(0, 5);
         }
