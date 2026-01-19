@@ -81,6 +81,15 @@ export default function Navbar({ isScrolled, mobileMenuOpen, setMobileMenuOpen, 
                             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                         </button>
 
+                        <a
+                            href="https://ppdb-smp-terpadu-al-ittihadiyah.vercel.app/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-black rounded-full hover:opacity-90 transition-all flex items-center gap-2 shadow-xl shadow-indigo-500/20 uppercase tracking-widest"
+                        >
+                            PPDB 2025
+                        </a>
+
                         <Link href="/admin" className="px-6 py-2.5 bg-[var(--accent)] text-white text-sm font-black rounded-full hover:opacity-90 transition-all flex items-center gap-2 shadow-xl shadow-purple-500/20 uppercase tracking-widest">
                             <Plus size={16} /> Post Berita
                         </Link>
@@ -124,6 +133,16 @@ export default function Navbar({ isScrolled, mobileMenuOpen, setMobileMenuOpen, 
                     </button>
 
                     <Link href="/" onClick={() => setMobileMenuOpen?.(false)} className="text-3xl font-black text-[var(--foreground)] uppercase tracking-tighter">Beranda</Link>
+
+                    <a
+                        href="https://ppdb-smp-terpadu-al-ittihadiyah.vercel.app/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setMobileMenuOpen?.(false)}
+                        className="text-3xl font-black text-indigo-500 uppercase tracking-tighter"
+                    >
+                        PPDB 2025
+                    </a>
 
                     {user && (
                         <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen?.(false)} className="text-3xl font-black text-purple-500 uppercase tracking-tighter">Dashboard</Link>

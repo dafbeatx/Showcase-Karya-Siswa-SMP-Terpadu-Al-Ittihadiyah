@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import NewsCard from '@/components/NewsCard';
 import Footer from '@/components/Footer';
+import PPDBBanner from '@/components/PPDBBanner';
 import { Loader2 } from 'lucide-react';
 
 interface HomeClientProps {
@@ -58,6 +59,8 @@ export default function HomeClient({ initialNews }: HomeClientProps) {
                     setActiveCategory={setActiveCategory}
                     setIsModalOpen={() => { }}
                 />
+
+                <PPDBBanner />
 
                 <section id="berita-terbaru" className="max-w-7xl mx-auto px-4 md:px-6 pb-24 scroll-mt-24">
                     <div className="flex items-center justify-between mb-12">

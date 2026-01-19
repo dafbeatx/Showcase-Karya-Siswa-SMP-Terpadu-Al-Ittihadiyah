@@ -17,6 +17,14 @@ export default function Footer() {
                         <p className="text-gray-500 text-sm leading-relaxed font-medium">Portal berita dan informasi resmi SMP Terpadu Al-Ittihadiyah. Tetap terhubung dengan perkembangan terbaru di sekolah kami.</p>
                     </div>
                     <div className="space-y-4">
+                        <h3 className="font-bold uppercase text-xs tracking-widest text-gray-400">Tautan Penting</h3>
+                        <ul className="space-y-3">
+                            <li><a href="https://ppdb-smp-terpadu-al-ittihadiyah.vercel.app/" target="_blank" rel="noreferrer" className="text-sm font-bold text-gray-500 hover:text-[var(--accent)] transition-colors uppercase tracking-wider">PPDB Online 2025</a></li>
+                            <li><a href="/" className="text-sm font-bold text-gray-500 hover:text-[var(--foreground)] transition-colors uppercase tracking-wider">Beranda</a></li>
+                            <li><a href="/admin" className="text-sm font-bold text-gray-500 hover:text-[var(--foreground)] transition-colors uppercase tracking-wider">Kirim Berita</a></li>
+                        </ul>
+                    </div>
+                    <div className="space-y-4">
                         <h3 className="font-bold">Hubungi Kami</h3>
                         <ul className="space-y-3">
                             <li><a href="https://wa.me/62895351251395" target="_blank" rel="noreferrer" className="flex items-start gap-3 text-gray-400 hover:text-green-500 transition-colors group"><Phone size={18} className="mt-1 group-hover:scale-110 transition-transform" /><span className="text-sm">+62 895 3512 51395 <br /><span className="text-xs opacity-60">(WhatsApp Admin)</span></span></a></li>
