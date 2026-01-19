@@ -92,13 +92,19 @@ export default function AdminPage() {
 
         setIsSubmitting(true);
         try {
-            await uploadNewsPost(formData);
-            showStatus('success', 'Berita berhasil diterbitkan!');
-            setFormData({ title: '', content: '', image_url: '', image_source: '' });
-            fetchNews();
+            const result = await uploadNewsPost(formData);
+            if (result.success) {
+                showStatus('success', 'Berita berhasil diterbitkan!');
+                setFormData({ title: '', content: '', image_url: '', image_source: '' });
+                fetchNews();
+            } else {
+                showStatus('error', 'Gagal menerbitkan: ' + (result.error || 'Terjadi kesalahan.'));
+            }
         } catch (error: any) {
-            showStatus('error', 'Gagal menerbitkan: ' + error.message);
+            console.error('Submit Error:', error);
+            showStatus('error', 'Gagal menerbitkan: ' + (error.message || 'Terjadi kesalahan sistem.'));
         } finally {
+            setIsSubmitting(true); // Wait, why was this true in original? It should be false.
             setIsSubmitting(false);
         }
     };
@@ -106,11 +112,16 @@ export default function AdminPage() {
     const handleDelete = async (id: string) => {
         if (!confirm('Yakin ingin menghapus berita ini?')) return;
         try {
-            await deleteNewsPost(id);
-            showStatus('success', 'Berita telah dihapus.');
-            fetchNews();
+            const result = await deleteNewsPost(id);
+            if (result.success) {
+                showStatus('success', 'Berita telah dihapus.');
+                fetchNews();
+            } else {
+                showStatus('error', 'Gagal menghapus: ' + (result.error || 'Terjadi kesalahan.'));
+            }
         } catch (error: any) {
-            showStatus('error', 'Gagal menghapus: ' + error.message);
+            console.error('Delete Error:', error);
+            showStatus('error', 'Gagal menghapus: ' + (error.message || 'Terjadi kesalahan sistem.'));
         }
     };
 
