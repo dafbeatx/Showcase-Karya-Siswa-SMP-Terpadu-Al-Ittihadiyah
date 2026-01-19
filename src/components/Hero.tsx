@@ -32,7 +32,7 @@ export default function Hero({
                 Showcase Resmi SMP Terpadu Al-Ittihadiyah
             </div>
             <h1 className="text-3xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter mb-3 md:mb-6 leading-[1.2] md:leading-tight">
-                Portal <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500">Berita</span> & <br className="hidden md:block" /> Kegiatan Sekolah.
+                Portal <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500">Berita</span> & <br className="hidden md:block" /> Kegiatan Sekolah.
             </h1>
             <p className="text-gray-500 text-sm md:text-xl max-w-2xl mx-auto mb-5 leading-relaxed px-2 font-medium">
                 Informasi terkini mengenai kegiatan, prestasi, dan pengumuman resmi dari SMP Terpadu Al-Ittihadiyah.

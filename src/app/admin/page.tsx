@@ -83,7 +83,7 @@ export default function AdminPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] selection:bg-purple-500/30">
+        <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] selection:bg-emerald-500/30">
             <Navbar isScrolled={isScrolled} />
 
             {/* Status Notification */}
@@ -98,15 +98,15 @@ export default function AdminPage() {
 
             <main className="pt-24 md:pt-32 pb-16 md:pb-24 max-w-4xl mx-auto px-4 md:px-6">
                 <header className="text-center space-y-3 md:space-y-4 mb-8 md:mb-12">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-500 text-[10px] md:text-xs font-black uppercase tracking-widest animate-fade-in-up">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] md:text-xs font-black uppercase tracking-widest animate-fade-in-up">
                         <Sparkles size={16} /> Bagikan Cerita Sekolahmu
                     </div>
-                    <h1 className="text-3xl md:text-6xl font-black tracking-tight">Tulis <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-indigo-500">Berita</span> Baru</h1>
+                    <h1 className="text-3xl md:text-6xl font-black tracking-tight">Tulis <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-green-500">Berita</span> Baru</h1>
                     <p className="text-gray-500 text-sm md:text-base font-medium">Informasi prestasi, kegiatan, atau pengumuman resmi sekolah.</p>
                 </header>
 
                 <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8 bg-[var(--card-bg)] border border-[var(--border)] p-6 md:p-12 rounded-[32px] md:rounded-[40px] shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-500 to-indigo-500 opacity-50"></div>
+                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 to-green-500 opacity-50"></div>
 
                     <div className="space-y-1.5 md:space-y-3">
                         <label className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Judul Berita</label>
@@ -179,7 +179,7 @@ export default function AdminPage() {
                     <button
                         type="submit"
                         disabled={isSubmitting || isUploadingImg}
-                        className="w-full py-4.5 md:py-6 bg-[var(--accent)] text-white font-black text-base md:text-xl rounded-xl md:rounded-2xl hover:opacity-90 flex justify-center items-center gap-2 md:gap-3 transition-all active:scale-[0.98] disabled:opacity-50 shadow-xl shadow-purple-500/20 uppercase tracking-widest"
+                        className="w-full py-4.5 md:py-6 bg-[var(--accent)] text-white font-black text-base md:text-xl rounded-xl md:rounded-2xl hover:opacity-90 flex justify-center items-center gap-2 md:gap-3 transition-all active:scale-[0.98] disabled:opacity-50 shadow-xl shadow-emerald-500/20 uppercase tracking-widest"
                     >
                         {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
                         <span>{isSubmitting ? 'Menerbitkan...' : 'Terbitkan Cerita'}</span>

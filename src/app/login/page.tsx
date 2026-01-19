@@ -39,15 +39,15 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] selection:bg-purple-500/30">
+        <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] selection:bg-emerald-500/30">
             <Navbar isScrolled={true} />
 
             <main className="flex items-center justify-center min-h-screen p-6">
                 <div className="w-full max-w-md space-y-8 bg-[var(--card-bg)] p-8 md:p-10 rounded-[40px] border border-[var(--border)] shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-500 to-indigo-500"></div>
+                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 to-green-500"></div>
 
                     <div className="text-center space-y-2">
-                        <div className="inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-purple-500/10 text-purple-500 mb-4 border border-purple-500/20 shadow-inner">
+                        <div className="inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-emerald-500/10 text-emerald-500 mb-4 border border-emerald-500/20 shadow-inner">
                             <LogIn size={32} />
                         </div>
                         <h1 className="text-3xl font-black tracking-tight uppercase">Portal Admin</h1>
@@ -76,7 +76,7 @@ export default function LoginPage() {
                                 type="email"
                                 required
                                 placeholder="admin@alittihadiyah.sch.id"
-                                className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-6 py-5 outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all font-medium text-[var(--foreground)] shadow-sm"
+                                className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-6 py-5 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all font-medium text-[var(--foreground)] shadow-sm"
                             />
                         </div>
 
@@ -87,14 +87,14 @@ export default function LoginPage() {
                                 type="password"
                                 required
                                 placeholder="••••••••"
-                                className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-6 py-5 outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 transition-all font-medium text-[var(--foreground)] shadow-sm"
+                                className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-6 py-5 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all font-medium text-[var(--foreground)] shadow-sm"
                             />
                         </div>
 
                         <button
                             type="submit"
                             disabled={isLoading || success}
-                            className="w-full py-5 bg-[var(--accent)] text-white font-black text-lg rounded-2xl hover:opacity-90 transition-all active:scale-[0.98] flex items-center justify-center gap-3 shadow-xl shadow-purple-500/20 disabled:opacity-50 uppercase tracking-widest mt-8"
+                            className="w-full py-5 bg-[var(--accent)] text-white font-black text-lg rounded-2xl hover:opacity-90 transition-all active:scale-[0.98] flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20 disabled:opacity-50 uppercase tracking-widest mt-8"
                         >
                             {isLoading ? <Loader2 className="animate-spin" size={24} /> : <LogIn size={24} />}
                             Masuk Ke Panel

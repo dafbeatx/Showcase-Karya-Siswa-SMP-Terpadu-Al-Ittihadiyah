@@ -133,7 +133,7 @@ export default function AdminDashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] selection:bg-purple-500/30">
+        <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] selection:bg-emerald-500/30">
             <Navbar isScrolled={isScrolled} />
 
             {/* Status Notification */}
@@ -147,8 +147,8 @@ export default function AdminDashboard() {
             <main className="pt-32 pb-24 max-w-7xl mx-auto px-4 md:px-6">
                 <header className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
                     <div className="flex items-center gap-6">
-                        <div className="h-20 w-20 bg-purple-500/10 rounded-[32px] flex items-center justify-center border border-purple-500/20 shadow-inner">
-                            <LayoutDashboard className="text-purple-500" size={40} strokeWidth={2.5} />
+                        <div className="h-20 w-20 bg-emerald-500/10 rounded-[32px] flex items-center justify-center border border-emerald-500/20 shadow-inner">
+                            <LayoutDashboard className="text-emerald-500" size={40} strokeWidth={2.5} />
                         </div>
                         <div>
                             <h1 className="text-4xl font-black tracking-tight uppercase leading-none mb-2">Dashboard</h1>
@@ -156,7 +156,7 @@ export default function AdminDashboard() {
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
-                        <Link href="/admin" className="px-8 py-4 bg-[var(--accent)] text-white font-black rounded-2xl flex items-center gap-2 hover:opacity-90 transition-all shadow-xl shadow-purple-500/30 uppercase tracking-widest text-sm">
+                        <Link href="/admin" className="px-8 py-4 bg-[var(--accent)] text-white font-black rounded-2xl flex items-center gap-2 hover:opacity-90 transition-all shadow-xl shadow-emerald-500/30 uppercase tracking-widest text-sm">
                             <Plus size={20} /> Tulis Berita
                         </Link>
                         <button onClick={handleLogout} className="px-8 py-4 bg-[var(--card-bg)] border border-[var(--border)] text-red-500 font-black rounded-2xl flex items-center gap-2 hover:bg-red-500/10 transition-all uppercase tracking-widest text-sm shadow-sm group">
@@ -169,7 +169,7 @@ export default function AdminDashboard() {
                     {[
                         { label: 'Total Berita', value: news.length, color: 'text-[var(--foreground)]' },
                         { label: 'Featured Berita', value: news.filter(n => n.is_featured).length, color: 'text-yellow-500' },
-                        { label: 'Publikasi Hari Ini', value: news.filter(n => new Date(n.created_at).toDateString() === new Date().toDateString()).length, color: 'text-purple-500' }
+                        { label: 'Publikasi Hari Ini', value: news.filter(n => new Date(n.created_at).toDateString() === new Date().toDateString()).length, color: 'text-emerald-500' }
                     ].map((stat, i) => (
                         <div key={i} className="p-8 rounded-[32px] bg-[var(--card-bg)] border border-[var(--border)] shadow-sm relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -202,7 +202,7 @@ export default function AdminDashboard() {
                                 {isLoading ? (
                                     <tr>
                                         <td colSpan={4} className="px-8 py-32 text-center">
-                                            <Loader2 className="animate-spin text-purple-500 mx-auto mb-6" size={48} />
+                                            <Loader2 className="animate-spin text-emerald-500 mx-auto mb-6" size={48} />
                                             <p className="text-gray-400 font-black uppercase tracking-widest text-xs">Synchronizing data...</p>
                                         </td>
                                     </tr>
@@ -286,7 +286,7 @@ export default function AdminDashboard() {
                                     required
                                     value={editPost.title}
                                     onChange={(e) => setEditPost({ ...editPost, title: e.target.value })}
-                                    className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-6 py-5 outline-none focus:border-purple-500 transition-all font-black text-lg uppercase tracking-tight shadow-sm"
+                                    className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-6 py-5 outline-none focus:border-emerald-500 transition-all font-black text-lg uppercase tracking-tight shadow-sm"
                                 />
                             </div>
 
@@ -297,7 +297,7 @@ export default function AdminDashboard() {
                                     rows={10}
                                     value={editPost.content}
                                     onChange={(e) => setEditPost({ ...editPost, content: e.target.value })}
-                                    className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-6 py-5 outline-none focus:border-purple-500 transition-all resize-none leading-relaxed font-medium shadow-sm"
+                                    className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-6 py-5 outline-none focus:border-emerald-500 transition-all resize-none leading-relaxed font-medium shadow-sm"
                                 />
                             </div>
 
@@ -306,14 +306,14 @@ export default function AdminDashboard() {
                                 <input
                                     value={editPost.image_source || ''}
                                     onChange={(e) => setEditPost({ ...editPost, image_source: e.target.value })}
-                                    className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-6 py-5 outline-none focus:border-purple-500 transition-all font-medium shadow-sm"
+                                    className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-6 py-5 outline-none focus:border-emerald-500 transition-all font-medium shadow-sm"
                                 />
                             </div>
 
                             <button
                                 type="submit"
                                 disabled={isActionLoading}
-                                className="w-full py-6 bg-[var(--accent)] text-white font-black text-xl rounded-2xl hover:opacity-90 flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-purple-500/20 uppercase tracking-widest"
+                                className="w-full py-6 bg-[var(--accent)] text-white font-black text-xl rounded-2xl hover:opacity-90 flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-emerald-500/20 uppercase tracking-widest"
                             >
                                 {isActionLoading ? <Loader2 className="animate-spin" size={24} /> : <CheckCircle2 size={24} />}
                                 Synchronize Updates

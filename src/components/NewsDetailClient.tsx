@@ -28,7 +28,7 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
         return (
             <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col items-center justify-center gap-6">
                 <h2 className="text-2xl font-bold italic">Berita tidak ditemukan</h2>
-                <button onClick={() => router.push('/')} className="px-8 py-3 bg-[var(--accent)] text-white rounded-full font-bold shadow-lg shadow-purple-500/20 active:scale-95 transition-all">Kembali</button>
+                <button onClick={() => router.push('/')} className="px-8 py-3 bg-[var(--accent)] text-white rounded-full font-bold shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">Kembali</button>
             </div>
         );
     }
@@ -64,7 +64,7 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
     };
 
     return (
-        <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] selection:bg-purple-500/30">
+        <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] selection:bg-emerald-500/30">
             <Navbar
                 isScrolled={isScrolled}
                 mobileMenuOpen={false}
@@ -98,7 +98,7 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
                             </header>
 
                             <div className="space-y-4">
-                                <div className="relative w-full aspect-[16/9] rounded-[32px] md:rounded-[40px] overflow-hidden shadow-2xl border border-[var(--border)] shadow-purple-500/5">
+                                <div className="relative w-full aspect-[16/9] rounded-[32px] md:rounded-[40px] overflow-hidden shadow-2xl border border-[var(--border)] shadow-emerald-500/5">
                                     <Image
                                         src={post.image_url || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=2070&auto=format&fit=crop'}
                                         alt={post.title}

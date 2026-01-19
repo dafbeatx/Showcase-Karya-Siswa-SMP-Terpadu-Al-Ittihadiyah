@@ -5,7 +5,7 @@
   --foreground: #ededed;
   --card-bg: #18181b;
   --border: rgba(255, 255, 255, 0.1);
-  --accent: #a855f7;
+  --accent: #10b981;
 }
 
 :root.light {
@@ -13,7 +13,7 @@
   --foreground: #0f172a;
   --card-bg: #ffffff;
   --border: rgba(0, 0, 0, 0.05);
-  --accent: #7c3aed;
+  --accent: #059669;
 }
 
 body {

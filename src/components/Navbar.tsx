@@ -85,12 +85,12 @@ export default function Navbar({ isScrolled, mobileMenuOpen, setMobileMenuOpen, 
                             href="https://ppdb-smp-terpadu-al-ittihadiyah.vercel.app/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-black rounded-full hover:opacity-90 transition-all flex items-center gap-2 shadow-xl shadow-indigo-500/20 uppercase tracking-widest"
+                            className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 text-white text-sm font-black rounded-full hover:opacity-90 transition-all flex items-center gap-2 shadow-xl shadow-emerald-500/20 uppercase tracking-widest"
                         >
                             PPDB 2026/2027
                         </a>
 
-                        <Link href="/admin" className="px-6 py-2.5 bg-[var(--accent)] text-white text-sm font-black rounded-full hover:opacity-90 transition-all flex items-center gap-2 shadow-xl shadow-purple-500/20 uppercase tracking-widest">
+                        <Link href="/admin" className="px-6 py-2.5 bg-[var(--accent)] text-white text-sm font-black rounded-full hover:opacity-90 transition-all flex items-center gap-2 shadow-xl shadow-emerald-500/20 uppercase tracking-widest">
                             <Plus size={16} /> Post Berita
                         </Link>
 
@@ -139,18 +139,18 @@ export default function Navbar({ isScrolled, mobileMenuOpen, setMobileMenuOpen, 
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => setMobileMenuOpen?.(false)}
-                        className="text-3xl font-black text-indigo-500 uppercase tracking-tighter"
+                        className="text-3xl font-black text-emerald-500 uppercase tracking-tighter"
                     >
                         PPDB 2026/2027
                     </a>
 
                     {user && (
-                        <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen?.(false)} className="text-3xl font-black text-purple-500 uppercase tracking-tighter">Dashboard</Link>
+                        <Link href="/admin/dashboard" onClick={() => setMobileMenuOpen?.(false)} className="text-3xl font-black text-green-500 uppercase tracking-tighter">Dashboard</Link>
                     )}
 
                     <div className="w-full h-px bg-[var(--border)] max-w-xs"></div>
 
-                    <Link href="/admin" onClick={() => setMobileMenuOpen?.(false)} className="w-full max-w-xs px-8 py-5 bg-[var(--accent)] text-white text-xl font-black rounded-3xl flex items-center justify-center gap-3 shadow-xl shadow-purple-500/20 uppercase tracking-widest">
+                    <Link href="/admin" onClick={() => setMobileMenuOpen?.(false)} className="w-full max-w-xs px-8 py-5 bg-[var(--accent)] text-white text-xl font-black rounded-3xl flex items-center justify-center gap-3 shadow-xl shadow-emerald-500/20 uppercase tracking-widest">
                         <Plus size={24} /> Post Berita
                     </Link>
 

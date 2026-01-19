@@ -28,7 +28,7 @@ export default function NewsCard({ post }: NewsCardProps) {
     const excerpt = content.substring(0, 100) + (content.length > 100 ? '...' : '');
 
     return (
-        <div className="group bg-[var(--card-bg)] backdrop-blur-md border border-[var(--border)] rounded-3xl overflow-hidden hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:border-[var(--accent)]/30 flex flex-col h-full shadow-sm">
+        <div className="group bg-[var(--card-bg)] backdrop-blur-md border border-[var(--border)] rounded-3xl overflow-hidden hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-500/10 hover:border-[var(--accent)]/30 flex flex-col h-full shadow-sm">
             <div className="relative h-48 md:h-56 overflow-hidden">
                 <Image
                     src={image_url || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=2070&auto=format&fit=crop'}
