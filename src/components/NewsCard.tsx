@@ -29,7 +29,7 @@ export default function NewsCard({ post }: NewsCardProps) {
 
     return (
         <div className="group bg-[var(--card-bg)] backdrop-blur-md border border-[var(--border)] rounded-3xl overflow-hidden hover:-translate-y-2 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:border-[var(--accent)]/30 flex flex-col h-full shadow-sm">
-            <div className="relative h-56 overflow-hidden">
+            <div className="relative h-48 md:h-56 overflow-hidden">
                 <Image
                     src={image_url || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=2070&auto=format&fit=crop'}
                     alt={title}
@@ -39,17 +39,17 @@ export default function NewsCard({ post }: NewsCardProps) {
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--card-bg)] to-transparent opacity-60" />
             </div>
 
-            <div className="p-6 flex flex-col flex-grow">
-                <div className="flex items-center gap-2 text-[var(--accent)] text-xs font-bold uppercase tracking-wider mb-3">
-                    <Calendar size={14} />
+            <div className="p-5 md:p-6 flex flex-col flex-grow">
+                <div className="flex items-center gap-2 text-[var(--accent)] text-[10px] md:text-xs font-bold uppercase tracking-wider mb-2 md:mb-3">
+                    <Calendar size={12} />
                     {formattedDate}
                 </div>
 
-                <h3 className="text-xl font-bold mb-3 group-hover:text-[var(--accent)] transition-colors line-clamp-2 leading-tight">
+                <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3 group-hover:text-[var(--accent)] transition-colors line-clamp-2 leading-tight">
                     {title}
                 </h3>
 
-                <p className="text-gray-500 text-sm mb-6 line-clamp-3 leading-relaxed">
+                <p className="text-gray-500 text-xs md:text-sm mb-5 md:mb-6 line-clamp-3 leading-relaxed">
                     {excerpt}
                 </p>
 

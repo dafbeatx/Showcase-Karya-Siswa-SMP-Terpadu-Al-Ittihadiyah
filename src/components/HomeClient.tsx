@@ -62,9 +62,9 @@ export default function HomeClient({ initialNews }: HomeClientProps) {
 
                 <PPDBBanner />
 
-                <section id="berita-terbaru" className="max-w-7xl mx-auto px-4 md:px-6 pb-24 scroll-mt-24">
-                    <div className="flex items-center justify-between mb-12">
-                        <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight italic">Berita <span className="text-[var(--accent)]">Terbaru</span></h2>
+                <section id="berita-terbaru" className="max-w-7xl mx-auto px-4 md:px-6 pb-16 md:pb-24 scroll-mt-24">
+                    <div className="flex items-center justify-between mb-8 md:mb-12">
+                        <h2 className="text-xl md:text-3xl font-extrabold tracking-tight italic">Berita <span className="text-[var(--accent)]">Terbaru</span></h2>
                         <div className="h-px flex-grow bg-[var(--border)] mx-8 hidden md:block"></div>
                     </div>
 

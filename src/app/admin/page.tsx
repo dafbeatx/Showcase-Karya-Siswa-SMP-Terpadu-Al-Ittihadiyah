@@ -96,38 +96,38 @@ export default function AdminPage() {
                 </div>
             )}
 
-            <main className="pt-32 pb-24 max-w-4xl mx-auto px-4 md:px-6">
-                <header className="text-center space-y-4 mb-12">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-500 text-xs font-black uppercase tracking-widest animate-fade-in-up">
+            <main className="pt-24 md:pt-32 pb-16 md:pb-24 max-w-4xl mx-auto px-4 md:px-6">
+                <header className="text-center space-y-3 md:space-y-4 mb-8 md:mb-12">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-500 text-[10px] md:text-xs font-black uppercase tracking-widest animate-fade-in-up">
                         <Sparkles size={16} /> Bagikan Cerita Sekolahmu
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-black tracking-tight">Tulis <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-indigo-500">Berita</span> Baru</h1>
-                    <p className="text-gray-500 font-medium">Informasi prestasi, kegiatan, atau pengumuman seru dari sekolah kita.</p>
+                    <h1 className="text-3xl md:text-6xl font-black tracking-tight">Tulis <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-indigo-500">Berita</span> Baru</h1>
+                    <p className="text-gray-500 text-sm md:text-base font-medium">Informasi prestasi, kegiatan, atau pengumuman resmi sekolah.</p>
                 </header>
 
-                <form onSubmit={handleSubmit} className="space-y-8 bg-[var(--card-bg)] border border-[var(--border)] p-8 md:p-12 rounded-[40px] shadow-2xl relative overflow-hidden">
+                <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8 bg-[var(--card-bg)] border border-[var(--border)] p-6 md:p-12 rounded-[32px] md:rounded-[40px] shadow-2xl relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-500 to-indigo-500 opacity-50"></div>
 
-                    <div className="space-y-3">
-                        <label className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Judul Berita</label>
+                    <div className="space-y-1.5 md:space-y-3">
+                        <label className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Judul Berita</label>
                         <input
                             required
                             value={formData.title}
                             onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                             placeholder="Apa judul berita hari ini?"
-                            className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-6 py-5 text-lg font-bold text-[var(--foreground)] focus:border-[var(--accent)] outline-none transition-all shadow-sm"
+                            className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-5 py-4 md:px-6 md:py-5 text-base md:text-lg font-bold text-[var(--foreground)] focus:border-[var(--accent)] outline-none transition-all shadow-sm"
                         />
                     </div>
 
-                    <div className="space-y-3">
-                        <label className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Konten Lengkap</label>
+                    <div className="space-y-1.5 md:space-y-3">
+                        <label className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Konten Lengkap</label>
                         <textarea
                             required
-                            rows={10}
+                            rows={8}
                             value={formData.content}
                             onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                            placeholder="Ceritakan sedetail mungkin kegiatan yang berlangsung..."
-                            className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-6 py-5 text-[var(--foreground)] focus:border-[var(--accent)] outline-none transition-all resize-none leading-relaxed shadow-sm font-medium"
+                            placeholder="Ceritakan sedetail mungkin..."
+                            className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-5 py-4 md:px-6 md:py-5 text-sm md:text-base text-[var(--foreground)] focus:border-[var(--accent)] outline-none transition-all resize-none leading-relaxed shadow-sm font-medium"
                         />
                     </div>
 
@@ -179,10 +179,10 @@ export default function AdminPage() {
                     <button
                         type="submit"
                         disabled={isSubmitting || isUploadingImg}
-                        className="w-full py-6 bg-[var(--accent)] text-white font-black text-xl rounded-2xl hover:opacity-90 flex justify-center items-center gap-3 transition-all active:scale-[0.98] disabled:opacity-50 shadow-xl shadow-purple-500/20 uppercase tracking-widest"
+                        className="w-full py-4.5 md:py-6 bg-[var(--accent)] text-white font-black text-base md:text-xl rounded-xl md:rounded-2xl hover:opacity-90 flex justify-center items-center gap-2 md:gap-3 transition-all active:scale-[0.98] disabled:opacity-50 shadow-xl shadow-purple-500/20 uppercase tracking-widest"
                     >
-                        {isSubmitting ? <Loader2 className="animate-spin" size={24} /> : <Send size={24} />}
-                        Terbitkan Cerita
+                        {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
+                        <span>{isSubmitting ? 'Menerbitkan...' : 'Terbitkan Cerita'}</span>
                     </button>
                 </form>
 
@@ -192,6 +192,6 @@ export default function AdminPage() {
             </main>
 
             <Footer />
-        </div>
+        </div >
     );
 }

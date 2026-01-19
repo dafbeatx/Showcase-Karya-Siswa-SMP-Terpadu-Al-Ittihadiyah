@@ -51,13 +51,13 @@ export default function Navbar({ isScrolled, mobileMenuOpen, setMobileMenuOpen, 
         <>
             <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-[var(--background)]/80 backdrop-blur-md border-b border-[var(--border)] py-3 md:py-4' : 'bg-transparent py-4 md:py-6'}`}>
                 <div className="max-w-7xl mx-auto px-4 md:px-6 flex justify-between items-center">
-                    <Link href="/" className="flex items-center gap-3 group cursor-pointer flex-shrink-0">
-                        <div className="h-9 w-9 md:h-10 md:w-10 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 flex items-center justify-center overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-300 relative">
+                    <Link href="/" className="flex items-center gap-2 md:gap-3 group cursor-pointer flex-shrink-0">
+                        <div className="h-8 w-8 md:h-10 md:w-10 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 flex items-center justify-center overflow-hidden shadow-lg group-hover:scale-105 transition-transform duration-300 relative">
                             <Image src="/logo1.png" alt="Logo" fill className="object-cover" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-base md:text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-[var(--foreground)] to-gray-500 group-hover:to-[var(--foreground)] transition-all uppercase tracking-tight">Portal Berita</span>
-                            <span className="text-[9px] md:text-[10px] font-bold text-gray-400 tracking-[0.2em] uppercase -mt-0.5 group-hover:text-purple-400 transition-colors">SMP Terpadu Al-Ittihadiyah</span>
+                            <span className="text-sm md:text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-[var(--foreground)] to-gray-500 group-hover:to-[var(--foreground)] transition-all uppercase tracking-tight">Portal Berita</span>
+                            <span className="text-[7px] md:text-[10px] font-bold text-gray-400 tracking-[0.15em] md:tracking-[0.2em] uppercase -mt-0.5 group-hover:text-purple-400 transition-colors">SMP Terpadu Al-Ittihadiyah</span>
                         </div>
                     </Link>
 
@@ -108,15 +108,15 @@ export default function Navbar({ isScrolled, mobileMenuOpen, setMobileMenuOpen, 
                         )}
                     </div>
 
-                    <div className="flex items-center gap-3 md:hidden">
+                    <div className="flex items-center gap-2 md:gap-3 md:hidden">
                         <button
                             onClick={toggleTheme}
-                            className="p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--border)] text-gray-500"
+                            className="p-2 md:p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--border)] text-gray-500"
                         >
-                            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
                         </button>
                         <button className="text-[var(--foreground)] p-2 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl" onClick={() => setMobileMenuOpen?.(!mobileMenuOpen)}>
-                            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
                         </button>
                     </div>
                 </div>
