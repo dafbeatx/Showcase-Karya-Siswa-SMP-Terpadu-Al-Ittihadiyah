@@ -11,14 +11,14 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL || "https://smptaialittihadiyah.vercel.app"
   ),
-  title: "Portal Berita | SMP Terpadu Al-Ittihadiyah",
+  title: "Portal Berita SMP Terpadu Al-Ittihadiyah",
   description:
     "Dapatkan informasi terbaru, berita kegiatan, dan prestasi siswa dari SMP Terpadu Al-Ittihadiyah.",
   icons: {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "Portal Berita | SMP Terpadu Al-Ittihadiyah",
+    title: "Portal Berita SMP Terpadu Al-Ittihadiyah",
     description:
       "Dapatkan informasi terbaru, berita kegiatan, dan prestasi siswa dari SMP Terpadu Al-Ittihadiyah.",
     url: "/",
@@ -28,15 +28,15 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/og-image.png",
-        width: 1024,
-        height: 486,
+        width: 1200,
+        height: 630,
         alt: "Portal Berita SMP Terpadu Al-Ittihadiyah",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Portal Berita | SMP Terpadu Al-Ittihadiyah",
+    title: "Portal Berita SMP Terpadu Al-Ittihadiyah",
     description:
       "Dapatkan informasi terbaru, berita kegiatan, dan prestasi siswa dari SMP Terpadu Al-Ittihadiyah.",
     images: ["/og-image.png"],
