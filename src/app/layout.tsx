@@ -18,21 +18,28 @@ export const metadata: Metadata = {
     icon: "/favicon.ico",
   },
   openGraph: {
+    title: "Portal Berita | SMP Terpadu Al-Ittihadiyah",
+    description:
+      "Dapatkan informasi terbaru, berita kegiatan, dan prestasi siswa dari SMP Terpadu Al-Ittihadiyah.",
+    url: "/",
     siteName: "SMP Terpadu Al-Ittihadiyah",
     locale: "id_ID",
     type: "website",
     images: [
       {
-        url: "/thumbnail.png",
-        width: 1200,
-        height: 630,
-        alt: "SMP Terpadu Al-Ittihadiyah",
+        url: "/og-image.png",
+        width: 1024,
+        height: 486,
+        alt: "Portal Berita SMP Terpadu Al-Ittihadiyah",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/thumbnail.png"],
+    title: "Portal Berita | SMP Terpadu Al-Ittihadiyah",
+    description:
+      "Dapatkan informasi terbaru, berita kegiatan, dan prestasi siswa dari SMP Terpadu Al-Ittihadiyah.",
+    images: ["/og-image.png"],
   },
 };
 
