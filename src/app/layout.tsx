@@ -8,10 +8,31 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://smptaialittihadiyah.vercel.app"
+  ),
   title: "Portal Berita | SMP Terpadu Al-Ittihadiyah",
-  description: "Dapatkan informasi terbaru, berita kegiatan, dan prestasi siswa dari SMP Terpadu Al-Ittihadiyah.",
+  description:
+    "Dapatkan informasi terbaru, berita kegiatan, dan prestasi siswa dari SMP Terpadu Al-Ittihadiyah.",
   icons: {
     icon: "/favicon.ico",
+  },
+  openGraph: {
+    siteName: "SMP Terpadu Al-Ittihadiyah",
+    locale: "id_ID",
+    type: "website",
+    images: [
+      {
+        url: "/thumbnail.png",
+        width: 1200,
+        height: 630,
+        alt: "SMP Terpadu Al-Ittihadiyah",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/thumbnail.png"],
   },
 };
 

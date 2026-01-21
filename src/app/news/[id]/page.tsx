@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { getNewsPostById, getNewsPosts } from '@/actions/news';
 import NewsDetailClient from '@/components/NewsDetailClient';
 import { notFound } from 'next/navigation';
@@ -8,6 +9,54 @@ export const dynamic = 'force-dynamic';
 
 interface PageProps {
     params: Promise<{ id: string }>;
+}
+
+// Generate dynamic metadata for social media sharing
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { id } = await params;
+    const post = await getNewsPostById(id);
+
+    if (!post) {
+        return {
+            title: 'Berita Tidak Ditemukan | SMP Terpadu Al-Ittihadiyah',
+            description: 'Halaman berita yang Anda cari tidak tersedia.',
+        };
+    }
+
+    // Clean HTML tags and limit description length
+    const cleanDescription = post.content
+        ?.replace(/<[^>]*>/g, '')
+        .substring(0, 160)
+        .trim() + '...';
+
+    // Use article image or fallback to default thumbnail
+    const imageUrl = post.image_url || '/thumbnail.png';
+
+    return {
+        title: `${post.title} | SMP Terpadu Al-Ittihadiyah`,
+        description: cleanDescription,
+        openGraph: {
+            title: post.title,
+            description: cleanDescription,
+            images: [
+                {
+                    url: imageUrl,
+                    width: 1200,
+                    height: 630,
+                    alt: post.title,
+                },
+            ],
+            type: 'article',
+            siteName: 'SMP Terpadu Al-Ittihadiyah',
+            locale: 'id_ID',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: post.title,
+            description: cleanDescription,
+            images: [imageUrl],
+        },
+    };
 }
 
 export default async function NewsDetailPage({ params }: PageProps) {
