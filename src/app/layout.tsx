@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     title: "Portal Berita SMP Terpadu Al-Ittihadiyah",
     description:
       "Dapatkan informasi terbaru, berita kegiatan, dan prestasi siswa dari SMP Terpadu Al-Ittihadiyah.",
-    url: "/",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://smptaialittihadiyah.vercel.app",
     siteName: "SMP Terpadu Al-Ittihadiyah",
     locale: "id_ID",
     type: "website",

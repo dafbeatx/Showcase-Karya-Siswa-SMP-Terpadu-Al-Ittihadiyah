@@ -15,6 +15,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { id } = await params;
     const post = await getNewsPostById(id);
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://smptaialittihadiyah.vercel.app';
 
     if (!post) {
         return {
@@ -24,13 +25,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
 
     // Clean HTML tags and limit description length
-    const cleanDescription = post.content
-        ?.replace(/<[^>]*>/g, '')
-        .substring(0, 160)
-        .trim() + '...';
+    const rawText = post.content?.replace(/<[^>]*>/g, '').trim() || '';
+    const cleanDescription = rawText.length > 160
+        ? rawText.substring(0, 160).trim() + '...'
+        : rawText || 'Baca berita selengkapnya di Portal Berita SMP Terpadu Al-Ittihadiyah.';
 
-    // Use article image or fallback to default thumbnail
-    const imageUrl = post.image_url || '/thumbnail.png';
+    // Helper to ensure absolute URL for images
+    const getAbsoluteImageUrl = (url: string | null | undefined): string => {
+        if (!url) return `${siteUrl}/og-image.png`;
+        // Already absolute (Supabase URLs)
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+        // Local path - make absolute
+        return `${siteUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+    };
+
+    const imageUrl = getAbsoluteImageUrl(post.image_url);
+    const articleUrl = `${siteUrl}/news/${id}`;
 
     return {
         title: `${post.title} | SMP Terpadu Al-Ittihadiyah`,
@@ -38,6 +50,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         openGraph: {
             title: post.title,
             description: cleanDescription,
+            url: articleUrl,
             images: [
                 {
                     url: imageUrl,
@@ -49,6 +62,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             type: 'article',
             siteName: 'SMP Terpadu Al-Ittihadiyah',
             locale: 'id_ID',
+            publishedTime: post.created_at,
         },
         twitter: {
             card: 'summary_large_image',
