@@ -3,10 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Calendar, ChevronLeft, Share2, Facebook, Link as LinkIcon, Check, User } from 'lucide-react';
+import { 
+    Calendar, ChevronLeft, Share2, Facebook, Link as LinkIcon, Check, User,
+    Eye, MessageCircle, Send, Loader2
+} from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { 
+    incrementViewCount, getNewsEngagement, 
+    addComment, getComments, 
+    addReaction, getUserReactions 
+} from '@/actions/news';
 
 const XIcon = ({ className }: { className?: string }) => (
     <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="currentColor">
@@ -20,6 +28,15 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
+// Reaction emojis
+const REACTIONS = [
+    { type: 'like', emoji: '👍', label: 'Suka' },
+    { type: 'love', emoji: '❤️', label: 'Cinta' },
+    { type: 'wow', emoji: '😮', label: 'Wow' },
+    { type: 'sad', emoji: '😢', label: 'Sedih' },
+    { type: 'angry', emoji: '😠', label: 'Marah' },
+];
+
 interface NewsPost {
     id: string;
     title: string;
@@ -31,6 +48,7 @@ interface NewsPost {
     author_role?: string;
     is_featured?: boolean;
     created_at: string;
+    view_count?: number;
 }
 
 interface OtherNewsItem {
@@ -40,9 +58,27 @@ interface OtherNewsItem {
     created_at: string;
 }
 
+interface Comment {
+    id: string;
+    author_name: string;
+    content: string;
+    created_at: string;
+}
+
 interface NewsDetailClientProps {
     post: NewsPost;
     otherNews: OtherNewsItem[];
+}
+
+// Generate session ID for reactions
+function getSessionId() {
+    if (typeof window === 'undefined') return '';
+    let sessionId = localStorage.getItem('news_session_id');
+    if (!sessionId) {
+        sessionId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+        localStorage.setItem('news_session_id', sessionId);
+    }
+    return sessionId;
 }
 
 export default function NewsDetailClient({ post, otherNews }: NewsDetailClientProps) {
@@ -50,11 +86,104 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
     const [isScrolled, setIsScrolled] = useState(false);
     const [copied, setCopied] = useState(false);
 
+    // Engagement state
+    const [viewCount, setViewCount] = useState(post.view_count || 0);
+    const [reactions, setReactions] = useState<Record<string, number>>({
+        like: 0, love: 0, wow: 0, sad: 0, angry: 0
+    });
+    const [userReactions, setUserReactions] = useState<string[]>([]);
+    const [comments, setComments] = useState<Comment[]>([]);
+    const [isLoadingComments, setIsLoadingComments] = useState(true);
+
+    // Comment form
+    const [commentName, setCommentName] = useState('');
+    const [commentContent, setCommentContent] = useState('');
+    const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+    const [commentError, setCommentError] = useState('');
+
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 20);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // Load data on mount
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadData = async () => {
+            // Increment view count
+            incrementViewCount(post.id);
+
+            // Load engagement
+            const engagement = await getNewsEngagement(post.id);
+            if (isMounted && engagement) {
+                setViewCount(engagement.viewCount);
+                setReactions(engagement.reactions);
+            }
+
+            // Load user reactions
+            const sessionId = getSessionId();
+            const userReacts = await getUserReactions(post.id, sessionId);
+            if (isMounted) {
+                setUserReactions(userReacts);
+            }
+
+            // Load comments
+            const commentsData = await getComments(post.id);
+            if (isMounted) {
+                setComments(commentsData);
+                setIsLoadingComments(false);
+            }
+        };
+
+        loadData();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [post.id]);
+
+    // Handle reaction
+    const handleReaction = async (reactionType: string) => {
+        const sessionId = getSessionId();
+        const result = await addReaction(post.id, reactionType, sessionId);
+        
+        if (result.success) {
+            // Update local state
+            setReactions(prev => ({
+                ...prev,
+                [reactionType]: prev[reactionType] + (result.action === 'added' ? 1 : -1)
+            }));
+            
+            if (result.action === 'added') {
+                setUserReactions(prev => [...prev, reactionType]);
+            } else {
+                setUserReactions(prev => prev.filter(r => r !== reactionType));
+            }
+        }
+    };
+
+    // Handle comment submit
+    const handleCommentSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setCommentError('');
+        setIsSubmittingComment(true);
+
+        const result = await addComment(post.id, commentName, commentContent);
+        
+        if (result.success) {
+            setCommentName('');
+            setCommentContent('');
+            // Reload comments
+            const newComments = await getComments(post.id);
+            setComments(newComments);
+        } else {
+            setCommentError(result.error || 'Gagal mengirim komentar');
+        }
+        
+        setIsSubmittingComment(false);
+    };
 
     if (!post) {
         return (
@@ -97,14 +226,24 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
         }
     };
 
+    const formatTimeAgo = (dateString: string) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        if (diffMins < 1) return 'Baru saja';
+        if (diffMins < 60) return `${diffMins} menit lalu`;
+        if (diffHours < 24) return `${diffHours} jam lalu`;
+        if (diffDays < 7) return `${diffDays} hari lalu`;
+        return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    };
+
     return (
         <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] selection:bg-emerald-500/30">
-            <Navbar
-                isScrolled={isScrolled}
-                mobileMenuOpen={false}
-                setMobileMenuOpen={() => { }}
-                setIsModalOpen={() => { }}
-            />
+            <Navbar isScrolled={isScrolled} mobileMenuOpen={false} setMobileMenuOpen={() => { }} />
 
             <main className="pt-32 pb-24">
                 <div className="max-w-7xl mx-auto px-4 md:px-6">
@@ -129,9 +268,11 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
                                             {post.category}
                                         </div>
                                     )}
-                                    {post.is_featured && (
-                                        <span className="px-2 py-1 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded text-[10px] font-bold">FEATURED</span>
-                                    )}
+                                    {/* View Count Badge */}
+                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded-lg text-[10px] font-black uppercase tracking-wider">
+                                        <Eye size={14} />
+                                        {viewCount.toLocaleString()} pembaca
+                                    </div>
                                 </div>
                                 <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-8 leading-[1.1] md:leading-[1.2]">
                                     {post.title}
@@ -175,6 +316,103 @@ export default function NewsDetailClient({ post, otherNews }: NewsDetailClientPr
                                 {post.content.split('\n').map((para: string, i: number) => (
                                     para.trim() && <p key={i} className="text-gray-500 text-lg md:text-xl leading-relaxed mb-6 font-medium">{para}</p>
                                 ))}
+                            </div>
+
+                            {/* REACTIONS SECTION */}
+                            <div className="pt-8 border-t border-[var(--border)]">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6">
+                                    Bagaimana menurutmu?
+                                </h4>
+                                <div className="flex flex-wrap gap-3">
+                                    {REACTIONS.map((reaction) => (
+                                        <button
+                                            key={reaction.type}
+                                            onClick={() => handleReaction(reaction.type)}
+                                            className={`flex items-center gap-2 px-4 py-3 rounded-2xl border transition-all hover:scale-105 active:scale-95 ${
+                                                userReactions.includes(reaction.type)
+                                                    ? 'bg-[var(--accent)]/10 border-[var(--accent)]/30 text-[var(--accent)]'
+                                                    : 'bg-[var(--card-bg)] border-[var(--border)] hover:border-[var(--accent)]/30'
+                                            }`}
+                                        >
+                                            <span className="text-2xl">{reaction.emoji}</span>
+                                            <span className="font-bold text-sm">{reactions[reaction.type] || 0}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* COMMENTS SECTION */}
+                            <div className="pt-8 border-t border-[var(--border)]">
+                                <div className="flex items-center gap-3 mb-8">
+                                    <MessageCircle size={20} className="text-[var(--accent)]" />
+                                    <h4 className="text-lg font-black uppercase tracking-tight">
+                                        Komentar ({comments.length})
+                                    </h4>
+                                </div>
+
+                                {/* Comment Form */}
+                                <form onSubmit={handleCommentSubmit} className="space-y-4 mb-8">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <input
+                                            type="text"
+                                            placeholder="Nama kamu"
+                                            value={commentName}
+                                            onChange={(e) => setCommentName(e.target.value)}
+                                            required
+                                            minLength={2}
+                                            className="w-full px-5 py-4 bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl outline-none focus:border-[var(--accent)] transition-all font-medium"
+                                        />
+                                        <div className="hidden md:block" />
+                                    </div>
+                                    <textarea
+                                        placeholder="Tulis komentar..."
+                                        value={commentContent}
+                                        onChange={(e) => setCommentContent(e.target.value)}
+                                        required
+                                        minLength={3}
+                                        rows={3}
+                                        className="w-full px-5 py-4 bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl outline-none focus:border-[var(--accent)] transition-all font-medium resize-none"
+                                    />
+                                    {commentError && (
+                                        <p className="text-red-500 text-sm font-bold">{commentError}</p>
+                                    )}
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmittingComment}
+                                        className="px-6 py-3 bg-[var(--accent)] text-white font-bold rounded-xl flex items-center gap-2 hover:opacity-90 transition-all disabled:opacity-50 active:scale-95"
+                                    >
+                                        {isSubmittingComment ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                                        Kirim Komentar
+                                    </button>
+                                </form>
+
+                                {/* Comments List */}
+                                <div className="space-y-4">
+                                    {isLoadingComments ? (
+                                        <div className="flex items-center justify-center py-8">
+                                            <Loader2 size={24} className="animate-spin text-[var(--accent)]" />
+                                        </div>
+                                    ) : comments.length > 0 ? (
+                                        comments.map((comment) => (
+                                            <div key={comment.id} className="p-5 bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="h-8 w-8 rounded-full bg-[var(--accent)]/10 flex items-center justify-center text-[var(--accent)] text-xs font-bold">
+                                                            {comment.author_name.charAt(0).toUpperCase()}
+                                                        </div>
+                                                        <span className="font-bold text-sm">{comment.author_name}</span>
+                                                    </div>
+                                                    <span className="text-[10px] font-medium text-gray-500 uppercase tracking-widest">
+                                                        {formatTimeAgo(comment.created_at)}
+                                                    </span>
+                                                </div>
+                                                <p className="text-gray-500 font-medium leading-relaxed">{comment.content}</p>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-center text-gray-500 py-8 italic">Belum ada komentar. Jadilah yang pertama!</p>
+                                    )}
+                                </div>
                             </div>
 
                             {/* MOBILE ONLY SHARE */}
