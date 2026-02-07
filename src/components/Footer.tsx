@@ -1,6 +1,7 @@
 import React from 'react';
 import { Phone, MapPin, Github, Youtube, Instagram, Heart, Copyright } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Footer() {
     return (
@@ -20,8 +21,8 @@ export default function Footer() {
                         <h3 className="font-bold uppercase text-xs tracking-widest text-gray-400">Tautan Penting</h3>
                         <ul className="space-y-3">
                             <li><a href="https://ppdb-smp-terpadu-al-ittihadiyah.vercel.app/" target="_blank" rel="noreferrer" className="text-sm font-bold text-gray-500 hover:text-[var(--accent)] transition-colors uppercase tracking-wider">PPDB Online 2026/2027</a></li>
-                            <li><a href="/" className="text-sm font-bold text-gray-500 hover:text-[var(--foreground)] transition-colors uppercase tracking-wider">Beranda</a></li>
-                            <li><a href="/admin" className="text-sm font-bold text-gray-500 hover:text-[var(--foreground)] transition-colors uppercase tracking-wider">Kirim Berita</a></li>
+                            <li><Link href="/" className="text-sm font-bold text-gray-500 hover:text-[var(--foreground)] transition-colors uppercase tracking-wider">Beranda</Link></li>
+                            <li><Link href="/admin" className="text-sm font-bold text-gray-500 hover:text-[var(--foreground)] transition-colors uppercase tracking-wider">Kirim Berita</Link></li>
                         </ul>
                     </div>
                     <div className="space-y-4">

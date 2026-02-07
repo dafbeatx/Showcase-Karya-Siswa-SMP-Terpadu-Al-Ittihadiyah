@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Search, ArrowRight, Plus } from 'lucide-react';
+import { Search, ArrowRight } from 'lucide-react';
 
 interface HeroProps {
     searchTerm: string;
@@ -10,7 +10,6 @@ interface HeroProps {
     filterCategories: string[];
     activeCategory: string;
     setActiveCategory: (cat: string) => void;
-    setIsModalOpen: (open: boolean) => void;
 }
 
 export default function Hero({
@@ -19,8 +18,7 @@ export default function Hero({
     handleSearchSubmit,
     filterCategories,
     activeCategory,
-    setActiveCategory,
-    setIsModalOpen
+    setActiveCategory
 }: HeroProps) {
     return (
         <section className="pt-24 md:pt-44 pb-8 md:pb-16 px-4 md:px-6 max-w-7xl mx-auto text-center">

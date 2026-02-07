@@ -73,10 +73,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
 }
 
+interface NewsPost {
+    id: string;
+    title: string;
+    content: string;
+    image_url: string;
+    created_at: string;
+}
+
 export default async function NewsDetailPage({ params }: PageProps) {
     const { id } = await params;
     let post = null;
-    let otherNews: any[] = [];
+    let otherNews: NewsPost[] = [];
 
     try {
         // Fetch main post
@@ -87,7 +95,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
             const { data: allNews } = await getNewsPosts({ status: 'published', limit: 6 });
             // Filter out current news and take first 5
             otherNews = (allNews || [])
-                .filter((item: any) => item.id !== id)
+                .filter((item: NewsPost) => item.id !== id)
                 .slice(0, 5);
         }
     } catch (error) {

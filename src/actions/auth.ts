@@ -2,7 +2,6 @@
 
 import { createClient } from '@/lib/supabase-server';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 
 export async function signIn(formData: FormData) {
     const email = formData.get('email') as string;
@@ -28,8 +27,8 @@ export async function signIn(formData: FormData) {
 
         revalidatePath('/', 'layout');
         return { success: true };
-    } catch (e: any) {
-        console.error('Sign In Unexpected Error:', e);
+    } catch (error) {
+        console.error('Sign In Unexpected Error:', error);
         return { success: false, error: 'Terjadi kesalahan sistem saat mencoba login.' };
     }
 }
@@ -44,7 +43,7 @@ export async function signOut() {
 
         revalidatePath('/', 'layout');
         return { success: true };
-    } catch (e: any) {
+    } catch {
         return { success: false, error: 'Gagal logout.' };
     }
 }
@@ -58,7 +57,7 @@ export async function getUser() {
         if (error || !user) return null;
 
         return user;
-    } catch (e) {
+    } catch {
         return null;
     }
 }

@@ -2,13 +2,23 @@
 
 import React, { useState } from 'react';
 import { X, Sparkles, Edit3, ImageIcon, Link as LinkIcon, Upload, Loader2, Send, FolderOpen } from 'lucide-react';
-import { compressImage } from '@/utils/helpers';
 import { uploadImage } from '@/actions/projects';
+
+interface FormData {
+    title: string;
+    student_name: string;
+    class: string;
+    category: string;
+    description: string;
+    image_url: string;
+    drive_link: string;
+    tags: string;
+}
 
 interface UploadModalProps {
     isModalOpen: boolean;
     setIsModalOpen: (open: boolean) => void;
-    onSubmit: (formData: any) => Promise<void>;
+    onSubmit: (formData: FormData) => Promise<void>;
     isSubmitting: boolean;
 }
 
@@ -87,8 +97,8 @@ export default function UploadModal({ isModalOpen, setIsModalOpen, onSubmit, isS
                 tags: ''
             });
             setSelectedFile(null);
-        } catch (error: any) {
-            alert("Terjadi kesalahan: " + error.message);
+        } catch (error) {
+            alert("Terjadi kesalahan: " + (error instanceof Error ? error.message : 'Unknown error'));
         }
     };
 

@@ -123,8 +123,8 @@ export async function uploadNewsPost(formData: {
         revalidatePath('/');
         revalidatePath('/admin/dashboard');
         return { success: true, data };
-    } catch (e: any) {
-        return { success: false, error: e.message };
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }
 
@@ -169,8 +169,8 @@ export async function updateNewsPost(id: string, formData: {
         revalidatePath(`/news/${id}`);
         revalidatePath('/admin/dashboard');
         return { success: true, data };
-    } catch (e: any) {
-        return { success: false, error: e.message };
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }
 
@@ -192,8 +192,8 @@ export async function updateNewsStatus(id: string, status: 'published' | 'pendin
         revalidatePath(`/news/${id}`);
         revalidatePath('/admin/dashboard');
         return { success: true };
-    } catch (e: any) {
-        return { success: false, error: e.message };
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }
 
@@ -213,8 +213,8 @@ export async function deleteNewsPost(id: string) {
 
         revalidatePath('/');
         return { success: true };
-    } catch (e: any) {
-        return { success: false, error: e.message };
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
 }
 
@@ -240,7 +240,7 @@ export async function uploadNewsImage(file: File) {
             .getPublicUrl(filePath);
 
         return publicUrl;
-    } catch (e: any) {
-        throw e;
+    } catch (error) {
+        throw error;
     }
 }

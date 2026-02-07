@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Calendar, ChevronLeft, Share2, Facebook, Twitter, Link as LinkIcon, Check, User } from 'lucide-react';
+import { Calendar, ChevronLeft, Share2, Facebook, Link as LinkIcon, Check, User } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -20,9 +20,29 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
+interface NewsPost {
+    id: string;
+    title: string;
+    content: string;
+    image_url: string;
+    image_source?: string;
+    category?: string;
+    author_name?: string;
+    author_role?: string;
+    is_featured?: boolean;
+    created_at: string;
+}
+
+interface OtherNewsItem {
+    id: string;
+    title: string;
+    image_url: string;
+    created_at: string;
+}
+
 interface NewsDetailClientProps {
-    post: any;
-    otherNews: any[];
+    post: NewsPost;
+    otherNews: OtherNewsItem[];
 }
 
 export default function NewsDetailClient({ post, otherNews }: NewsDetailClientProps) {

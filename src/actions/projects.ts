@@ -23,7 +23,18 @@ export async function getProjects() {
     return data;
 }
 
-export async function uploadProject(formData: any) {
+interface ProjectFormData {
+    title: string;
+    student_name: string;
+    class: string;
+    category: string;
+    description: string;
+    image_url: string;
+    drive_link: string;
+    tags?: string;
+}
+
+export async function uploadProject(formData: ProjectFormData) {
     const supabase = await createClient();
 
     if (!supabase) throw new Error('Konfigurasi Supabase tidak ditemukan.');
@@ -75,7 +86,7 @@ export async function uploadImage(file: File) {
     const fileName = `${Math.random()}.${fileExt}`;
     const filePath = `${fileName}`;
 
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
         .from('showcase-projects')
         .upload(filePath, file);
 

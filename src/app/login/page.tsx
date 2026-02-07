@@ -31,7 +31,7 @@ export default function LoginPage() {
                 router.push('/admin/dashboard');
                 router.refresh(); // Ensure Navbar updates
             }
-        } catch (err: any) {
+        } catch {
             setError('Terjadi kesalahan koneksi.');
         } finally {
             setIsLoading(false);

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getNewsPosts, deleteNewsPost, updateNewsPost, updateNewsStatus } from '@/actions/news';
@@ -30,11 +30,25 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+interface NewsPost {
+    id: string;
+    title: string;
+    content: string;
+    image_url: string;
+    image_source?: string;
+    category?: string;
+    author_name?: string;
+    author_role?: string;
+    is_featured?: boolean;
+    status?: 'pending' | 'published' | 'rejected';
+    created_at: string;
+}
+
 export default function AdminDashboard() {
-    const [news, setNews] = useState<any[]>([]);
+    const [news, setNews] = useState<NewsPost[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isActionLoading, setIsActionLoading] = useState(false);
-    const [isScrolled] = useState(true);
+    const isScrolled = true;
     const [status, setStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
 
     // Filters
@@ -45,7 +59,18 @@ export default function AdminDashboard() {
     const supabase = createClient();
 
     // Edit Modal State
-    const [editPost, setEditPost] = useState<any | null>(null);
+    const [editPost, setEditPost] = useState<NewsPost | null>(null);
+
+    const fetchNews = useCallback(async () => {
+        setIsLoading(true);
+        const { data } = await getNewsPosts({
+            status: filterStatus === 'all' ? 'all' : filterStatus,
+            category: filterCategory,
+            limit: 100 // Load more for dashboard
+        });
+        setNews((data as NewsPost[]) || []);
+        setIsLoading(false);
+    }, [filterStatus, filterCategory]);
 
     useEffect(() => {
         const checkUser = async () => {
@@ -57,18 +82,7 @@ export default function AdminDashboard() {
         };
         checkUser();
         fetchNews();
-    }, [supabase, router, filterStatus, filterCategory]);
-
-    async function fetchNews() {
-        setIsLoading(true);
-        const { data } = await getNewsPosts({
-            status: filterStatus === 'all' ? 'all' as any : filterStatus,
-            category: filterCategory,
-            limit: 100 // Load more for dashboard
-        });
-        setNews(data || []);
-        setIsLoading(false);
-    }
+    }, [supabase, router, fetchNews]);
 
     const handleLogout = async () => {
         setIsActionLoading(true);
@@ -98,7 +112,7 @@ export default function AdminDashboard() {
             } else {
                 showStatus('error', 'Gagal menghapus: ' + result.error);
             }
-        } catch (e) {
+        } catch {
             showStatus('error', 'Terjadi kesalahan sistem.');
         } finally {
             setIsActionLoading(false);
@@ -115,7 +129,7 @@ export default function AdminDashboard() {
             } else {
                 showStatus('error', 'Gagal update status: ' + result.error);
             }
-        } catch (e) {
+        } catch {
             showStatus('error', 'Terjadi kesalahan sistem.');
         } finally {
             setIsActionLoading(false);
@@ -136,7 +150,7 @@ export default function AdminDashboard() {
             } else {
                 showStatus('error', 'Gagal update: ' + result.error);
             }
-        } catch (e) {
+        } catch {
             showStatus('error', 'Terjadi kesalahan sistem.');
         } finally {
             setIsActionLoading(false);
@@ -388,7 +402,7 @@ export default function AdminDashboard() {
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Status</label>
                                     <select
                                         value={editPost.status || 'pending'}
-                                        onChange={(e) => setEditPost({ ...editPost, status: e.target.value })}
+                                        onChange={(e) => setEditPost({ ...editPost, status: e.target.value as 'pending' | 'published' | 'rejected' })}
                                         className="w-full bg-[var(--background)] border border-[var(--border)] rounded-2xl px-6 py-5 outline-none focus:border-emerald-500 transition-all font-black text-sm uppercase tracking-widest shadow-sm appearance-none cursor-pointer"
                                     >
                                         <option value="pending">Pending</option>

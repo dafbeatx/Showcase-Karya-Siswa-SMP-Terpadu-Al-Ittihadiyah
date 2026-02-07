@@ -6,15 +6,24 @@ import Hero from '@/components/Hero';
 import NewsCard from '@/components/NewsCard';
 import Footer from '@/components/Footer';
 import PPDBBanner from '@/components/PPDBBanner';
-import { Loader2, Search, Filter, ArrowRight } from 'lucide-react';
+import { Loader2, Search, ArrowRight } from 'lucide-react';
 import { getNewsPosts } from '@/actions/news';
 
+interface NewsPost {
+    id: string;
+    title: string;
+    content: string;
+    image_url: string;
+    category?: string;
+    created_at: string;
+}
+
 interface HomeClientProps {
-    initialNews: any[];
+    initialNews: NewsPost[];
 }
 
 export default function HomeClient({ initialNews }: HomeClientProps) {
-    const [news, setNews] = useState<any[]>(initialNews);
+    const [news, setNews] = useState<NewsPost[]>(initialNews);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState('All');
     const [isScrolled, setIsScrolled] = useState(false);
@@ -87,7 +96,6 @@ export default function HomeClient({ initialNews }: HomeClientProps) {
                     filterCategories={categories}
                     activeCategory={activeCategory}
                     setActiveCategory={setActiveCategory}
-                    setIsModalOpen={() => { }}
                 />
 
                 <PPDBBanner />

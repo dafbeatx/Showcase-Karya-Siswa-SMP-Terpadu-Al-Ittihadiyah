@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Menu, X, Plus, Sun, Moon, LayoutDashboard, LogIn, LogOut, User } from 'lucide-react';
+import { Menu, X, Plus, Sun, Moon, LayoutDashboard, LogIn, LogOut } from 'lucide-react';
 import Image from 'next/image';
 import { useTheme } from '@/context/ThemeContext';
 import { createClient } from '@/lib/supabase';
@@ -16,9 +16,14 @@ interface NavbarProps {
     setIsModalOpen?: (open: boolean) => void;
 }
 
-export default function Navbar({ isScrolled, mobileMenuOpen, setMobileMenuOpen, setIsModalOpen }: NavbarProps) {
+interface UserData {
+    id: string;
+    email?: string;
+}
+
+export default function Navbar({ isScrolled, mobileMenuOpen, setMobileMenuOpen }: NavbarProps) {
     const { theme, toggleTheme } = useTheme();
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<UserData | null>(null);
     const supabase = createClient();
     const router = useRouter();
 

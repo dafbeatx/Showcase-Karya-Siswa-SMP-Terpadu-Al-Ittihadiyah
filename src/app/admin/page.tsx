@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { uploadNewsPost, uploadNewsImage } from '@/actions/news';
@@ -10,7 +10,7 @@ import { compressImage } from '@/utils/helpers';
 import Link from 'next/link';
 
 export default function AdminPage() {
-    const [isScrolled, setIsScrolled] = useState(true);
+    const isScrolled = true;
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isUploadingImg, setIsUploadingImg] = useState(false);
 
@@ -61,9 +61,9 @@ export default function AdminPage() {
             const url = await uploadNewsImage(finalFile);
             setFormData(prev => ({ ...prev, image_url: url }));
             showStatus('success', 'Gambar berhasil dioptimalkan & diunggah.');
-        } catch (error: any) {
+        } catch (error) {
             console.error(error);
-            showStatus('error', 'Gagal memproses gambar: ' + (error.message || 'Terjadi kesalahan.'));
+            showStatus('error', 'Gagal memproses gambar: ' + (error instanceof Error ? error.message : 'Terjadi kesalahan.'));
         } finally {
             setIsUploadingImg(false);
         }
@@ -94,9 +94,9 @@ export default function AdminPage() {
             } else {
                 showStatus('error', 'Gagal menerbitkan: ' + (result.error || 'Terjadi kesalahan.'));
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error('Submit Error:', error);
-            showStatus('error', 'Gagal menerbitkan: ' + (error.message || 'Terjadi kesalahan sistem.'));
+            showStatus('error', 'Gagal menerbitkan: ' + (error instanceof Error ? error.message : 'Terjadi kesalahan sistem.'));
         } finally {
             setIsSubmitting(false);
         }
